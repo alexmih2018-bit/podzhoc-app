@@ -2446,11 +2446,10 @@
                 matchesCache.data = matches;
                 matchesCache.lastUpdated = Date.now();
                 
-                // Загружаем матчи для ставок
-                loadBettingMatches();
+                console.log(`📥 Кэш обновлен: ${matchesCache.data.length} матчей`);
                 
-            const container = document.getElementById('matches-container');
-            
+                const container = document.getElementById('matches-container');
+                
                 if (matches.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
@@ -2458,8 +2457,11 @@
                             <div>Нет доступных матчей</div>
                         </div>
                     `;
-                return;
-            }
+                    return;
+                }
+                
+                // Загружаем матчи для ставок
+                loadBettingMatches();
 
                 const now = new Date();
             const matchesHTML = matches.map(match => {
@@ -3237,12 +3239,17 @@
 
         // Загрузка матчей для ставок (ближайшие 24 часа)
         async function loadBettingMatches() {
+            console.log(`🎯 loadBettingMatches: начинаем загрузку`);
+            console.log(`🎯 Кэш матчей: ${matchesCache.data.length} матчей`);
+            
             // Загружаем ставки с сервера
             await loadUserBetsFromServer();
             
             const now = new Date();
             const next24Hours = new Date(now);
             next24Hours.setHours(next24Hours.getHours() + 24);
+            
+            console.log(`🎯 Время: сейчас ${now.toLocaleString('ru-RU', {timeZone: 'Europe/Moscow'})}, через 24 часа ${next24Hours.toLocaleString('ru-RU', {timeZone: 'Europe/Moscow'})}`);
             
             // Фильтруем матчи на ближайшие 24 часа
             const availableMatches = matchesCache.data.filter(match => {
