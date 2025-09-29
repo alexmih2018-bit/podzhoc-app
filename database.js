@@ -201,6 +201,7 @@ class Database {
 
     async createOrUpdateUser(telegramId, username, firstName) {
         return new Promise((resolve, reject) => {
+            const self = this; // Сохраняем ссылку на this
             this.db.run(
                 `INSERT OR REPLACE INTO users (telegramId, username, firstName, balance, totalBets, wonBets, lastBonusTime, updatedAt) 
                  VALUES (?, ?, ?, COALESCE((SELECT balance FROM users WHERE telegramId = ?), 1000), 
@@ -216,7 +217,7 @@ class Database {
                     }
                     
                     // Получаем полные данные созданного/обновленного пользователя
-                    this.db.get(
+                    self.db.get(
                         'SELECT * FROM users WHERE telegramId = ?',
                         [telegramId],
                         (err, row) => {
