@@ -1451,18 +1451,10 @@
             height: 100%;
         }
 
-        /* Стили для карточки информации о матче (вкладка МАТЧИ) */
+        /* Стили для карточки информации о матче (вкладка МАТЧИ) - новый дизайн */
         .match-info-card {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
-            padding: 20px;
             margin-bottom: 20px;
             transition: transform 0.2s ease, box-shadow 0.2s ease;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .match-info-card:hover {
@@ -1470,33 +1462,89 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        .teams-logos-container {
+        .match-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 20px;
+            padding: 0;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+        }
+
+        .match-time-section {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 12px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .match-time {
+            color: #ffffff;
+            font-size: 1rem;
+            font-weight: 600;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+        }
+
+        .teams-section {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            gap: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
         }
 
-        .team-logo-section {
+        .team-section {
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             flex: 1;
         }
 
+        .vs-section {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 20px;
+        }
+
         .team-logo {
-            width: 60px;
-            height: 60px;
+            width: 80px;
+            height: 80px;
             object-fit: contain;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px;
+            transition: transform 0.2s ease;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        .team-logo:hover {
+            transform: scale(1.05);
+        }
+
+        .team-logo-fallback {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
         }
 
         .team-name {
             color: #ffffff;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 700;
             text-align: center;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+            max-width: 120px;
+            line-height: 1.2;
         }
 
         /* Стили для списка матчей */
@@ -1515,11 +1563,50 @@
 
 
         .vs-text {
-            font-size: 1.5rem;
-            font-weight: bold;
+            font-size: 1.8rem;
+            font-weight: 900;
             color: #ffffff;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-            margin: 0 20px;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .match-status-section {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 12px 20px;
+            text-align: center;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .match-status {
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        .match-status.live {
+            background: linear-gradient(45deg, #ff4444, #ff6666);
+            color: #ffffff;
+            animation: pulse 2s infinite;
+            box-shadow: 0 4px 8px rgba(255, 68, 68, 0.3);
+        }
+
+        .match-status.scheduled {
+            background: linear-gradient(45deg, #4CAF50, #66BB6A);
+            color: #ffffff;
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.02); }
+            100% { opacity: 1; transform: scale(1); }
         }
 
         /* Стили для модального окна выбора суммы ставки */
@@ -3096,35 +3183,35 @@
         // Получение пути к логотипу команды
         function getTeamLogoPath(teamName) {
             const team = teamName.toLowerCase().trim();
-            let teamFolder = 'default';
+            let teamFile = 'default';
             
-            // Определяем папку команды (соответствует реальным файлам)
-            if (team.includes('амур') || team.includes('amur')) teamFolder = 'amur';
-            else if (team.includes('адмирал') || team.includes('admiral')) teamFolder = 'admiral';
-            else if (team.includes('цска') || team.includes('cska') || team.includes('цск')) teamFolder = 'cska';
-            else if (team.includes('динамо мн') || team.includes('dynamo mn') || team.includes('динамо минск')) teamFolder = 'dinamo_mn';
-            else if (team.includes('динамо') || team.includes('dynamo')) teamFolder = 'dinamo_m';
-            else if (team.includes('спартак') || team.includes('spartak')) teamFolder = 'spartak';
-            else if (team.includes('локомотив') || team.includes('lokomotiv')) teamFolder = 'lokomotiv';
-            else if (team.includes('ак барс') || team.includes('ak-bars') || team.includes('акбарс')) teamFolder = 'ak_bars';
-            else if (team.includes('салават') || team.includes('salavat')) teamFolder = 'salavat_yulaev';
-            else if (team.includes('авангард') || team.includes('avangard')) teamFolder = 'avangard';
-            else if (team.includes('металлург') || team.includes('metallurg')) teamFolder = 'metallurg_mg';
-            else if (team.includes('ска') || team.includes('петербург')) teamFolder = 'ska';
-            else if (team.includes('торпедо') || team.includes('torpedo')) teamFolder = 'torpedo';
-            else if (team.includes('автомобилист') || team.includes('avtomobilist')) teamFolder = 'avtomobilist';
-            else if (team.includes('барыс') || team.includes('barys')) teamFolder = 'bars';
-            else if (team.includes('лада') || team.includes('lada')) teamFolder = 'lada';
-            else if (team.includes('нефтехимик') || team.includes('neftekhimik')) teamFolder = 'neftekhimik';
-            else if (team.includes('северсталь') || team.includes('severstal')) teamFolder = 'sevrestal';
-            else if (team.includes('сибирь') || team.includes('sibir')) teamFolder = 'sibir';
-            else if (team.includes('сочи') || team.includes('sochi')) teamFolder = 'sochi';
-            else if (team.includes('трактор') || team.includes('traktor')) teamFolder = 'traktor';
+            // Определяем файл команды (соответствует файлам в bet_buttons)
+            if (team.includes('амур') || team.includes('amur')) teamFile = 'amur';
+            else if (team.includes('адмирал') || team.includes('admiral')) teamFile = 'admiral';
+            else if (team.includes('цска') || team.includes('cska') || team.includes('цск')) teamFile = 'cska';
+            else if (team.includes('динамо мн') || team.includes('dynamo mn') || team.includes('динамо минск')) teamFile = 'dinamo_mn';
+            else if (team.includes('динамо') || team.includes('dynamo')) teamFile = 'dinamo_m';
+            else if (team.includes('спартак') || team.includes('spartak')) teamFile = 'spartak';
+            else if (team.includes('локомотив') || team.includes('lokomotiv')) teamFile = 'lokomotiv';
+            else if (team.includes('ак барс') || team.includes('ak-bars') || team.includes('акбарс')) teamFile = 'ak_bars';
+            else if (team.includes('салават') || team.includes('salavat')) teamFile = 'salavat_yulaev';
+            else if (team.includes('авангард') || team.includes('avangard')) teamFile = 'avangard';
+            else if (team.includes('металлург') || team.includes('metallurg')) teamFile = 'metallurg_mg';
+            else if (team.includes('ска') || team.includes('петербург')) teamFile = 'ska';
+            else if (team.includes('торпедо') || team.includes('torpedo')) teamFile = 'torpedo';
+            else if (team.includes('автомобилист') || team.includes('avtomobilist')) teamFile = 'avtomobilist';
+            else if (team.includes('барыс') || team.includes('barys')) teamFile = 'bars';
+            else if (team.includes('лада') || team.includes('lada')) teamFile = 'lada';
+            else if (team.includes('нефтехимик') || team.includes('neftekhimik')) teamFile = 'neftekhimik';
+            else if (team.includes('северсталь') || team.includes('severstal')) teamFile = 'sevrestal';
+            else if (team.includes('сибирь') || team.includes('sibir')) teamFile = 'sibir';
+            else if (team.includes('сочи') || team.includes('sochi')) teamFile = 'sochi';
+            else if (team.includes('трактор') || team.includes('traktor')) teamFile = 'traktor';
             
-            console.log(`🔍 Поиск логотипа для команды "${teamName}" -> папка: ${teamFolder}`);
+            console.log(`🔍 Поиск логотипа для команды "${teamName}" -> файл: ${teamFile}`);
             
-            // Проверяем, существует ли файл логотипа
-            const logoPath = `images/logos/${teamFolder}.png`;
+            // Используем кнопки из папки bet_buttons
+            const logoPath = `images/bet_buttons/${teamFile}.png`;
             console.log(`📁 Путь к логотипу: ${logoPath}`);
             
             return logoPath;
@@ -3389,27 +3476,39 @@
             });
             
             const status = getMatchStatus(match);
+            const statusText = status === 'live' ? 'LIVE' : 'ЗАПЛАНИРОВАН';
+            const statusClass = status === 'live' ? 'live' : 'scheduled';
             
+            // Создаем карточку в стиле референса
             card.innerHTML = `
-                <div class="match-header">
-                    <div class="match-time">${matchTime}</div>
-                    <div class="match-status ${status}">${status === 'live' ? 'LIVE' : 'Запланирован'}</div>
-                </div>
-                
-                <div class="teams-logos-container">
-                    <div class="team-logo-section home">
-                        <img src="${homeLogoPath}" alt="${match.teamHome}" class="team-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="team-logo-fallback" style="display: none;">🏒</div>
-                        <div class="team-name">${match.teamHome}</div>
+                <div class="match-card">
+                    <div class="match-time-section">
+                        <div class="match-time">${matchTime}</div>
                     </div>
-                    <div class="vs-text">VS</div>
-                    <div class="team-logo-section away">
-                        <img src="${awayLogoPath}" alt="${match.teamAway}" class="team-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="team-logo-fallback" style="display: none;">🏒</div>
-                        <div class="team-name">${match.teamAway}</div>
+                    
+                    <div class="teams-section">
+                        <div class="team-section home-team">
+                            <img src="${homeLogoPath}" alt="${match.teamHome}" class="team-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="team-logo-fallback" style="display: none;">🏒</div>
+                            <div class="team-name">${match.teamHome}</div>
+                        </div>
+                        
+                        <div class="vs-section">
+                            <div class="vs-text">VS</div>
+                        </div>
+                        
+                        <div class="team-section away-team">
+                            <img src="${awayLogoPath}" alt="${match.teamAway}" class="team-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                            <div class="team-logo-fallback" style="display: none;">🏒</div>
+                            <div class="team-name">${match.teamAway}</div>
                         </div>
                     </div>
-                `;
+                    
+                    <div class="match-status-section">
+                        <div class="match-status ${statusClass}">${statusText}</div>
+                    </div>
+                </div>
+            `;
             
             return card;
         }
