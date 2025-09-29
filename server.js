@@ -1620,21 +1620,11 @@ app.get('/api/leaderboard', async (req, res) => {
         
         if (db) {
             // Используем базу данных
-            const usersFromDb = await new Promise((resolve, reject) => {
-                db.all('SELECT * FROM users ORDER BY balance DESC LIMIT 100', (err, rows) => {
-                    if (err) reject(err);
-                    else resolve(rows);
-                });
-            });
+            const usersFromDb = await db.getLeaderboard();
             
             leaderboard = await Promise.all(usersFromDb.map(async (user) => {
                 // Подсчитываем ставки из базы данных
-                const betsResult = await new Promise((resolve, reject) => {
-                    db.all('SELECT * FROM bets WHERE userId = ?', [user.telegramId], (err, rows) => {
-                        if (err) reject(err);
-                        else resolve(rows);
-                    });
-                });
+                const betsResult = await db.getUserBets(user.telegramId);
                 
                 const totalBets = betsResult.length;
                 const wonBets = betsResult.filter(bet => bet.status === 'won').length;
