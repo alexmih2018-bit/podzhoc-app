@@ -2074,7 +2074,7 @@
         let currentUser = null;
 
         // Инициализация Telegram WebApp
-        function initTelegram() {
+        async function initTelegram() {
             console.log('🔧 Инициализация Telegram WebApp...');
             console.log('🔧 tg:', tg);
             
@@ -3563,7 +3563,7 @@
 
         // Инициализация приложения
         document.addEventListener('DOMContentLoaded', async () => {
-            initTelegram();
+            await initTelegram();
             await loginUser();
             await loadMatches();
             await loadBonusInfo();
