@@ -1481,7 +1481,7 @@
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.1);
             position: relative;
-            min-height: 200px;
+            min-height: 240px;
         }
 
         .match-time-section {
@@ -1505,7 +1505,7 @@
             justify-content: space-between;
             padding: 0;
             background: rgba(255, 255, 255, 0.05);
-            min-height: 120px;
+            min-height: 160px;
             position: relative;
         }
 
@@ -1516,7 +1516,7 @@
             justify-content: center;
             flex: 1;
             position: relative;
-            padding: 15px;
+            padding: 0;
         }
 
         .team-section.home-team {
@@ -1527,28 +1527,27 @@
             background: linear-gradient(135deg, rgba(78, 205, 196, 0.1), rgba(78, 205, 196, 0.05));
         }
 
+        .team-logo-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            position: relative;
+            padding: 20px;
+        }
+
         .team-name {
             color: #ffffff;
             font-size: 1.1rem;
             font-weight: 700;
             text-align: center;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-family: 'KTF Jermilov', 'Inter', sans-serif;
-            z-index: 2;
+            z-index: 3;
             position: relative;
-        }
-
-        .team-logo-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1;
         }
 
         .vs-section {
@@ -1562,35 +1561,29 @@
         }
 
         .team-logo {
-            width: 100%;
-            height: 100%;
+            width: 120px;
+            height: 120px;
             object-fit: contain;
-            opacity: 0.3;
-            transition: opacity 0.2s ease;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+            transition: transform 0.2s ease;
+            z-index: 2;
+            position: relative;
         }
 
         .team-logo:hover {
-            opacity: 0.5;
+            transform: scale(1.05);
         }
 
         .team-logo-fallback {
-            width: 100%;
-            height: 100%;
+            width: 120px;
+            height: 120px;
             background: rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 3rem;
             color: #ffffff;
-            opacity: 0.3;
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+            z-index: 2;
+            position: relative;
         }
 
         .team-name {
@@ -3534,7 +3527,7 @@
             });
             
             const status = getMatchStatus(match);
-            const statusText = status === 'live' ? 'LIVE' : 'ЗАПЛАНИРОВАН';
+            const statusText = status === 'live' ? 'LIVE' : (match.arena || 'АРЕНА').toUpperCase();
             const statusClass = status === 'live' ? 'live' : 'scheduled';
             
             // Создаем карточку в стиле референса - логотипы по всей плоскости
@@ -3546,8 +3539,8 @@
                     
                     <div class="teams-section">
                         <div class="team-section home-team">
-                            <div class="team-name">${match.teamHome}</div>
                             <div class="team-logo-container">
+                                <div class="team-name">${match.teamHome}</div>
                                 <img src="${homeLogoPath}" alt="${match.teamHome}" class="team-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div class="team-logo-fallback" style="display: none;">🏒</div>
                             </div>
@@ -3558,8 +3551,8 @@
                         </div>
                         
                         <div class="team-section away-team">
-                            <div class="team-name">${match.teamAway}</div>
                             <div class="team-logo-container">
+                                <div class="team-name">${match.teamAway}</div>
                                 <img src="${awayLogoPath}" alt="${match.teamAway}" class="team-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div class="team-logo-fallback" style="display: none;">🏒</div>
                             </div>
