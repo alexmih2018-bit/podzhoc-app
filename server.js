@@ -1793,7 +1793,7 @@ app.get('/api/admin/bets', checkAdminToken, (req, res) => {
 });
 
 // API для ввода результатов матча
-app.post('/api/admin/match-result', checkAdminToken, (req, res) => {
+app.post('/api/admin/match-result', checkAdminToken, async (req, res) => {
     try {
         const { matchId, scoreHome, scoreAway } = req.body;
         
