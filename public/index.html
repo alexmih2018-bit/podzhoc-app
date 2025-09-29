@@ -2992,8 +2992,9 @@
 
         // Функция проверки возможности ставки
         function canBetOnMatch(match) {
-            const oneHourBefore = match.startTime - (60 * 60 * 1000);
-            const timeOk = Date.now() < oneHourBefore;
+            // Ставки закрываются за 15 минут до матча
+            const fifteenMinutesBefore = match.startTime - (15 * 60 * 1000);
+            const timeOk = Date.now() < fifteenMinutesBefore;
             
             // Проверяем, есть ли уже ставка на этот матч
             const hasBet = userBets.some(bet => bet.matchId === match.id);

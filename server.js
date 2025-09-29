@@ -118,9 +118,19 @@ function getAllRealKHLMatches() {
         const [day, month, year] = matchData.date.split('.');
         const [hour, minute] = matchData.time.split(':');
         
-        // Создаем дату матча в московском времени (UTC+3)
-        // Создаем дату напрямую в московском времени
-        const matchDate = new Date(parseInt(year), parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+        // Создаем дату матча - используем текущий год и ближайшие дни
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth();
+        const currentDay = now.getDate();
+        
+        // Создаем дату матча - используем правильный год 2025
+        const matchDate = new Date(2025, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+        
+        // Если матч уже прошел, пропускаем его
+        if (matchDate.getTime() < Date.now()) {
+            continue;
+        }
         
         const match = {
             id: matchId++,
@@ -1135,7 +1145,9 @@ async function getMatchStatus(match) {
     if (isFinished || match.status === 'finished') return 'finished';
     
     if (now >= startTime) return 'live';
-    if (now >= oneHourBefore) return 'betting_closed';
+    // Ставки закрываются за 15 минут до матча, а не за час
+    const fifteenMinutesBefore = startTime - (15 * 60 * 1000);
+    if (now >= fifteenMinutesBefore) return 'betting_closed';
     return 'scheduled';
 }
 
