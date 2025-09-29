@@ -1709,8 +1709,11 @@ app.get('/api/user/bets', async (req, res) => {
         console.log(`📋 Запрос истории ставок пользователя ${telegramId}`);
         
         // Проверяем, существует ли пользователь
+        console.log(`🔍 Ищем пользователя с telegramId: ${telegramId}`);
         const user = await getUser(telegramId);
+        console.log(`👤 Найденный пользователь:`, user);
         if (!user) {
+            console.log(`❌ Пользователь ${telegramId} не найден`);
             return res.status(404).json({ success: false, error: 'Пользователь не найден' });
         }
         
