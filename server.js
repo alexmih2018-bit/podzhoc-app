@@ -1833,8 +1833,15 @@ app.post('/api/admin/match-result', checkAdminToken, async (req, res) => {
         
         // Также обновляем в базе данных
         if (db) {
+            // Сначала обновляем счет в базе данных
+            await updateMatchScore(matchId, result.scoreHome, result.scoreAway);
+            // Затем завершаем матч
             await finishMatch(matchId);
         }
+        
+        // Принудительно обновляем кэш матчей для отображения в основном приложении
+        console.log(`🔄 Принудительное обновление кэша матчей после завершения матча`);
+        await loadMatches();
 
         // Автоматически рассчитываем выигрыши
         const matchBets = bets.filter(b => b.matchId === matchId && b.status === 'active');
@@ -1929,13 +1936,17 @@ app.post('/api/admin/update-score', checkAdminToken, async (req, res) => {
         console.log(`📊 Обновление счета матча ${matchId}: ${scoreHome}:${scoreAway}`);
         
         // Обновляем счет в базе данных или кэше
-        await updateMatchScore(matchId, scoreHome, scoreAway);
+        const updateResult = await updateMatchScore(matchId, scoreHome, scoreAway);
+        console.log(`📊 Результат обновления счета в БД:`, updateResult);
         
         // Находим матч в кэше и обновляем
         const matchIndex = matchesCache.data.findIndex(match => match.id === matchId);
         if (matchIndex !== -1) {
             matchesCache.data[matchIndex].scoreHome = scoreHome;
             matchesCache.data[matchIndex].scoreAway = scoreAway;
+            console.log(`📊 Счет обновлен в кэше для матча ${matchId}:`, matchesCache.data[matchIndex]);
+        } else {
+            console.log(`⚠️ Матч ${matchId} не найден в кэше`);
         }
         
         console.log(`✅ Счет матча ${matchId} обновлен: ${scoreHome}:${scoreAway}`);
@@ -1949,6 +1960,10 @@ app.post('/api/admin/update-score', checkAdminToken, async (req, res) => {
                 scoreAway: scoreAway
             }
         });
+        
+        // Принудительно обновляем кэш матчей для отображения в основном приложении
+        console.log(`🔄 Принудительное обновление кэша матчей после обновления счета`);
+        await loadMatches();
         
     } catch (error) {
         console.error('❌ Ошибка обновления счета:', error);
