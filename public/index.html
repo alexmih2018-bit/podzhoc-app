@@ -2092,7 +2092,8 @@
                         id: user.id,
                         username: user.username || `user_${user.id}`,
                         first_name: user.first_name || 'Пользователь',
-                        last_name: user.last_name || ''
+                        last_name: user.last_name || '',
+                        balance: 1000 // Начальный баланс
                     };
                     
                     console.log('🔧 currentUser установлен:', currentUser);
@@ -2100,14 +2101,16 @@
                     // Загружаем данные пользователя из базы данных
                     await loadUserFromDatabase();
                     
-                    // Показываем карточку пользователя
-                    const profileCorner = document.getElementById('profile-corner');
-                    const userAvatar = document.getElementById('user-avatar');
-                    const username = document.getElementById('username');
-                    
-                    if (profileCorner) profileCorner.style.display = 'block';
-                    if (userAvatar) userAvatar.textContent = currentUser.first_name[0]?.toUpperCase() || 'U';
-                    if (username) username.textContent = `@${currentUser.username}`;
+            // Показываем карточку пользователя
+            const profileCorner = document.getElementById('profile-corner');
+            const userAvatar = document.getElementById('user-avatar');
+            const username = document.getElementById('username');
+            const balanceElement = document.getElementById('balance');
+            
+            if (profileCorner) profileCorner.style.display = 'block';
+            if (userAvatar) userAvatar.textContent = currentUser.first_name[0]?.toUpperCase() || 'U';
+            if (username) username.textContent = `@${currentUser.username}`;
+            if (balanceElement) balanceElement.textContent = currentUser.balance;
                 } else {
                     console.log('❌ Данные пользователя не найдены, создаем анонимного пользователя');
                     // Создаем анонимного пользователя
@@ -2115,7 +2118,8 @@
                         id: Date.now(), // Уникальный ID на основе времени
                         username: 'anonymous',
                         first_name: 'Игрок',
-                        last_name: ''
+                        last_name: '',
+                        balance: 1000 // Начальный баланс
                     };
                 }
             } else {
@@ -2125,7 +2129,8 @@
                     id: Date.now(),
                     username: 'browser_user',
                     first_name: 'Игрок',
-                    last_name: ''
+                    last_name: '',
+                    balance: 1000 // Начальный баланс
                 };
             }
             
@@ -2229,7 +2234,7 @@
             try {
                 if (!currentUser) return;
                 
-                const response = await apiCall(`/user/${currentUser.id}`);
+                const response = await apiCall(`/user/${currentUser.id + '.0'}.0`);
                 if (response.success && response.data) {
                     // Обновляем данные пользователя из базы данных
                     currentUser.balance = response.data.balance || 1000;
@@ -2264,8 +2269,8 @@
                     return [];
                 }
                 
-                console.log(`📋 Загружаем ставки для пользователя ${currentUser.id}`);
-                const response = await apiCall(`/user/bets?telegramId=${currentUser.id}`);
+                console.log(`📋 Загружаем ставки для пользователя ${currentUser.id + '.0'}`);
+                const response = await apiCall(`/user/bets?telegramId=${currentUser.id + '.0'}`);
                 console.log('📋 Ответ API ставок:', response);
                 return response.data || [];
             } catch (error) {
@@ -2570,7 +2575,7 @@
                     return;
                 }
                 
-                const response = await apiCall(`/user/bets?userId=${currentUser.id}`);
+                const response = await apiCall(`/user/bets?userId=${currentUser.id + '.0'}`);
                 const bets = response.data || [];
                 
                 const container = document.getElementById('history-container');
@@ -2677,7 +2682,7 @@
             if (!currentUser) return [];
             
             try {
-                const response = await apiCall(`/user/bets?telegramId=${currentUser.id}`);
+                const response = await apiCall(`/user/bets?telegramId=${currentUser.id + '.0'}`);
                 if (response.success) {
                     userBets = response.data || [];
                     console.log('🎯 Загружены ставки с сервера:', userBets);
@@ -2709,12 +2714,12 @@
             }
 
             try {
-                console.log('🎯 Размещение ставки:', { matchId, team, amount, telegramId: currentUser.id });
+                console.log('🎯 Размещение ставки:', { matchId, team, amount, telegramId: currentUser.id + '.0' });
                 
                 const response = await apiCall('/bets/place', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id,
+                        telegramId: currentUser.id + '.0',
                         matchId: matchId,
                         betType: team,
                         amount: amount
@@ -2755,7 +2760,7 @@
                 const response = await apiCall('/user/login', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id,
+                        telegramId: currentUser.id + '.0',
                         firstName: currentUser.first_name || currentUser.username || 'Игрок',
                         username: currentUser.username
                     })
@@ -2805,7 +2810,7 @@
                 const response = await apiCall('/user/bonus', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id,
+                        telegramId: currentUser.id + '.0',
                         bonusAmount: bonusAmount
                     })
                 });
@@ -2940,7 +2945,7 @@
                 const response = await apiCall('/user/login', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id,
+                        telegramId: currentUser.id + '.0',
                         firstName: currentUser.first_name || currentUser.username || 'Игрок',
                         username: currentUser.username
                     })
@@ -3447,7 +3452,7 @@
                 const response = await apiCall('/bets/place', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id,
+                        telegramId: currentUser.id + '.0',
                         matchId: currentBetMatch.id,
                         betType: betType,
                         amount: selectedAmount
@@ -3484,7 +3489,7 @@
             if (!currentUser) return;
             
             try {
-                const response = await apiCall(`/bonus/info?telegramId=${currentUser.id}`);
+                const response = await apiCall(`/bonus/info?telegramId=${currentUser.id + '.0'}`);
                 if (response.success) {
                     updateBonusUI(response.data);
                 }
@@ -3525,7 +3530,7 @@
                 const response = await apiCall('/bonus/claim', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id
+                        telegramId: currentUser.id + '.0'
                     })
                 });
 
