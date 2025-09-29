@@ -3654,6 +3654,19 @@
                 // Обновляем матчи каждые 30 секунд
                 console.log('🔄 Автоматическое обновление матчей...');
                 await loadMatches();
+                
+                // Также обновляем текущую вкладку
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab) {
+                    const tabId = activeTab.id;
+                    if (tabId === 'matches-tab') {
+                        console.log('🔄 Обновляем вкладку МАТЧИ...');
+                        loadAllMatches();
+                    } else if (tabId === 'history-tab') {
+                        console.log('🔄 Обновляем вкладку ПРОШЕДШИЕ...');
+                        loadHistory();
+                    }
+                }
             }, 30000);
         });
     </script>
