@@ -226,6 +226,45 @@ class Database {
         });
     }
 
+    async clearAllData() {
+        return new Promise((resolve, reject) => {
+            this.db.serialize(() => {
+                this.db.run('DELETE FROM bets', (err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    console.log('✅ Ставки очищены');
+                });
+                
+                this.db.run('DELETE FROM users', (err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    console.log('✅ Пользователи очищены');
+                });
+                
+                this.db.run('DELETE FROM matches', (err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    console.log('✅ Матчи очищены');
+                });
+                
+                this.db.run('DELETE FROM bonuses', (err) => {
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    console.log('✅ Бонусы очищены');
+                    resolve();
+                });
+            });
+        });
+    }
+
     async updateUserStats(telegramId, totalBets, wonBets) {
         return new Promise((resolve, reject) => {
             this.db.run(

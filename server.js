@@ -155,24 +155,8 @@ async function parseKHLMatches() {
         // Загружаем все реальные матчи КХЛ
         const allRealMatches = getAllRealKHLMatches();
         
-        // Добавляем тестовый матч Адмирал vs Амур
-        const testMatch = {
-            id: 9999,
-            teamHome: 'Адмирал',
-            teamAway: 'Амур',
-            scoreHome: 0,
-            scoreAway: 0,
-            date: '29.09.2025',
-            startTime: new Date(2025, 8, 29, 10, 0, 0).getTime(), // 29 сентября 2025, 10:00 МСК
-            status: 'scheduled',
-            venue: 'Фетисов Арена',
-            league: 'КХЛ',
-            isRealData: true,
-            source: 'test'
-        };
-        
-        allRealMatches.push(testMatch);
-        console.log(`🏒 Добавлен тестовый матч: ${testMatch.teamHome} vs ${testMatch.teamAway} (${new Date(testMatch.startTime).toLocaleString('ru-RU')})`);
+        // Используем только реальные матчи КХЛ (тестовый матч убран)
+        console.log(`🏒 Загружено реальных матчей КХЛ: ${allRealMatches.length}`);
         
         // Фильтруем матчи - показываем только те, что начинаются в ближайшие 48 часов
         const now = new Date();

@@ -2331,13 +2331,15 @@
                                     month: '2-digit',
                                     year: 'numeric',
                                     hour: '2-digit',
-                                    minute: '2-digit'
+                                    minute: '2-digit',
+                                    timeZone: 'Europe/Moscow'
                                 }) : (bet.matchDate ? new Date(bet.matchDate).toLocaleString('ru-RU', {
                                     day: '2-digit',
                                     month: '2-digit',
                                     year: 'numeric',
                                     hour: '2-digit',
-                                    minute: '2-digit'
+                                    minute: '2-digit',
+                                    timeZone: 'Europe/Moscow'
                                 }) : 'Скоро');
                                 
                                 return `
@@ -2386,13 +2388,15 @@
                                     month: '2-digit',
                                     year: 'numeric',
                                     hour: '2-digit',
-                                    minute: '2-digit'
+                                    minute: '2-digit',
+                                    timeZone: 'Europe/Moscow'
                                 }) : (bet.matchDate ? new Date(bet.matchDate).toLocaleString('ru-RU', {
                                     day: '2-digit',
                                     month: '2-digit',
                                     year: 'numeric',
                                     hour: '2-digit',
-                                    minute: '2-digit'
+                                    minute: '2-digit',
+                                    timeZone: 'Europe/Moscow'
                                 }) : 'Скоро');
                                 
                                 return `
@@ -2464,7 +2468,8 @@
                         day: 'numeric',
                         month: 'numeric',
                         hour: '2-digit',
-                        minute: '2-digit'
+                        minute: '2-digit',
+                        timeZone: 'Europe/Moscow'
                     });
 
                     // Проверяем, сделана ли уже ставка на этот матч
@@ -2611,7 +2616,8 @@
                     day: 'numeric',
                     month: 'numeric',
                     hour: '2-digit',
-                    minute: '2-digit'
+                    minute: '2-digit',
+                    timeZone: 'Europe/Moscow'
                 });
 
                     const resultClass = bet.status === 'won' ? 'bet-won' : bet.status === 'lost' ? 'bet-lost' : '';
@@ -3173,7 +3179,8 @@
                 day: '2-digit',
                 month: '2-digit',
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                timeZone: 'Europe/Moscow'
             });
             
             const status = getMatchStatus(match);
@@ -3236,13 +3243,9 @@
             const next24Hours = new Date(now);
             next24Hours.setHours(next24Hours.getHours() + 24);
             
-            // Фильтруем матчи на ближайшие 24 часа (включая тестовый матч)
+            // Фильтруем матчи на ближайшие 24 часа
             const availableMatches = matchesCache.data.filter(match => {
                 const matchDate = new Date(match.startTime);
-                // Включаем тестовый матч независимо от времени
-                if (match.id === 9999) {
-                    return canBetOnMatch(match);
-                }
                 return matchDate >= now && matchDate <= next24Hours && canBetOnMatch(match);
             });
             
@@ -3263,13 +3266,9 @@
             const next48Hours = new Date(now);
             next48Hours.setHours(next48Hours.getHours() + 48);
             
-            // Фильтруем матчи на ближайшие 48 часов (включая тестовый матч)
+            // Фильтруем матчи на ближайшие 48 часов
             const allMatches = matchesCache.data.filter(match => {
                 const matchDate = new Date(match.startTime);
-                // Включаем тестовый матч независимо от времени
-                if (match.id === 9999) {
-                    return true;
-                }
                 return matchDate >= now && matchDate <= next48Hours;
             });
             
@@ -3355,7 +3354,8 @@
                 day: '2-digit',
                 month: '2-digit',
                 hour: '2-digit',
-                minute: '2-digit'
+                minute: '2-digit',
+                timeZone: 'Europe/Moscow'
             });
             
             const status = getMatchStatus(match);
