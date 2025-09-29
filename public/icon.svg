@@ -1,0 +1,15 @@
+<svg width="192" height="192" viewBox="0 0 192 192" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="192" height="192" rx="24" fill="url(#gradient0_linear_1_1)"/>
+<path d="M96 48C71.2 48 52 67.2 52 92S71.2 136 96 136S140 116.8 140 92S120.8 48 96 48Z" fill="white"/>
+<path d="M88 88H80V72H98V88H98V96H98V112H80V96H80V88Z" fill="#FF6B35"/>
+<path d="M96 64C96 64 100 68 100 72C100 76 96 80 96 80C96 80 92 76 92 72C92 68 96 64 96 64Z" fill="#FF6B35"/>
+<path d="M96 104C96 104 100 108 100 112C100 116 96 120 96 120C96 120 92 116 92 112C92 108 96 104 96 104Z" fill="#FF6B35"/>
+<defs>
+<linearGradient id="gradient0_linear_1_1" x1="0" y1="0" x2="192" y2="192" gradientUnits="userSpaceOnUse">
+<stop stop-color="#0a0e17"/>
+<stop offset="1" stop-color="#ff6b35"/>
+</linearGradient>
+</defs>
+</svg>
+
+
