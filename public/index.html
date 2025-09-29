@@ -2234,7 +2234,22 @@
             try {
                 if (!currentUser) return;
                 
-                const response = await apiCall(`/user/${currentUser.id + '.0'}.0`);
+                // Сначала пытаемся получить пользователя
+                let response = await apiCall(`/user/${currentUser.id + '.0'}`);
+                
+                if (!response.success) {
+                    // Если пользователь не найден, создаем его
+                    console.log('👤 Пользователь не найден, создаем нового...');
+                    response = await apiCall('/user/login', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            telegramId: currentUser.id + '.0',
+                            firstName: currentUser.first_name || currentUser.username || 'Игрок',
+                            username: currentUser.username
+                        })
+                    });
+                }
+                
                 if (response.success && response.data) {
                     // Обновляем данные пользователя из базы данных
                     currentUser.balance = response.data.balance || 1000;

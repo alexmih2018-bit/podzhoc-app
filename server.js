@@ -1708,6 +1708,12 @@ app.get('/api/user/bets', async (req, res) => {
         
         console.log(`📋 Запрос истории ставок пользователя ${telegramId}`);
         
+        // Проверяем, существует ли пользователь
+        const user = await getUser(telegramId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        
         // Получаем все ставки пользователя
         const userBets = await getUserBets(telegramId);
         
