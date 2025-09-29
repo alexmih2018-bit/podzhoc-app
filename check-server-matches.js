@@ -1,2 +1,2 @@
-const data = require('./khl-full-calendar.js');
-console.log('Матчей в файле на сервере:', data.length);
+const calendar = require('./khl-full-calendar.js');
+console.log('Матчей на сервере:', calendar.length);
