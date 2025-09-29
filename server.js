@@ -51,16 +51,8 @@ async function waitForDatabase() {
     
     while (attempts < maxAttempts) {
         try {
-            // Пробуем выполнить простой запрос к таблице users (которая точно должна быть)
-            await new Promise((resolve, reject) => {
-                db.get('SELECT COUNT(*) as count FROM users', (err, row) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        resolve(row);
-                    }
-                });
-            });
+            // Пробуем выполнить простой запрос к таблице users через метод класса
+            await db.getUser('test_user_id');
             console.log('✅ База данных готова к работе');
             return;
         } catch (error) {
