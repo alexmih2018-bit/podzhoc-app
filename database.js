@@ -253,12 +253,13 @@ class Database {
                     console.log('✅ Матчи очищены');
                 });
                 
+                // Таблица bonuses может не существовать, поэтому игнорируем ошибку
                 this.db.run('DELETE FROM bonuses', (err) => {
-                    if (err) {
+                    if (err && !err.message.includes('no such table')) {
                         reject(err);
                         return;
                     }
-                    console.log('✅ Бонусы очищены');
+                    console.log('✅ Бонусы очищены (или таблица не существует)');
                     resolve();
                 });
             });
