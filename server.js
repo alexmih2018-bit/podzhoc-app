@@ -1238,10 +1238,15 @@ let finishedMatches = [];
 
 // Функции для работы с пользователями
 async function getUser(telegramId) {
+    console.log(`🔍 getUser: telegramId=${telegramId}, db=${!!db}`);
     if (db) {
-        return await db.getUser(telegramId);
+        const result = await db.getUser(telegramId);
+        console.log(`🔍 getUser result:`, result);
+        return result;
     } else {
-        return users.find(u => u.telegramId == telegramId);
+        const result = users.find(u => u.telegramId == telegramId);
+        console.log(`🔍 getUser from memory:`, result);
+        return result;
     }
 }
 
