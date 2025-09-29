@@ -97,6 +97,8 @@ function getAllRealKHLMatches() {
     // Загружаем полный календарь КХЛ 2025-2026 из отдельного файла
     let calendarData = [];
     try {
+        // Очищаем кэш модуля для принудительной перезагрузки
+        delete require.cache[require.resolve('./khl-full-calendar.js')];
         calendarData = require('./khl-full-calendar.js');
         console.log(`📅 Загружен календарь с ${calendarData.length} матчами`);
     } catch (error) {
@@ -1833,10 +1835,18 @@ app.post('/api/admin/match-result', checkAdminToken, async (req, res) => {
         
         // Также обновляем в базе данных
         if (db) {
-            // Сначала обновляем счет в базе данных
-            await updateMatchScore(matchId, result.scoreHome, result.scoreAway);
-            // Затем завершаем матч
-            await finishMatch(matchId);
+            try {
+                console.log(`📊 Обновляем счет матча ${matchId} в БД: ${result.scoreHome}:${result.scoreAway}`);
+                // Сначала обновляем счет в базе данных
+                const updateResult = await updateMatchScore(matchId, result.scoreHome, result.scoreAway);
+                console.log(`📊 Результат обновления счета:`, updateResult);
+                // Затем завершаем матч
+                const finishResult = await finishMatch(matchId);
+                console.log(`📊 Результат завершения матча:`, finishResult);
+            } catch (error) {
+                console.error('❌ Ошибка обновления матча в БД:', error);
+                throw error;
+            }
         }
         
         // Принудительно обновляем кэш матчей для отображения в основном приложении
