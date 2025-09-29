@@ -661,7 +661,7 @@
 
                 const now = new Date();
                 const liveMatches = matches.filter(match => {
-                    const matchTime = new Date(match.date);
+                    const matchTime = new Date(match.startTime);
                     return matchTime <= now && match.status === 'scheduled';
                 }).length;
 
@@ -760,7 +760,7 @@
 
                 const now = new Date();
                 const matchesHTML = matches.map(match => {
-                    const matchDate = new Date(match.date);
+                    const matchDate = new Date(match.startTime);
                     const formattedDate = matchDate.toLocaleString('ru-RU', {
                         day: 'numeric',
                         month: 'numeric',
