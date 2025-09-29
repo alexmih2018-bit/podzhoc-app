@@ -1124,14 +1124,15 @@ function formatTimeUntilBonus(milliseconds) {
 // ==================== БАЗОВЫЕ ФУНКЦИИ ====================
 
 async function canBetOnMatch(matchStartTime, matchId) {
-    const oneHourBefore = matchStartTime - (60 * 60 * 1000);
+    // Ставки закрываются за 15 минут до матча
+    const fifteenMinutesBefore = matchStartTime - (15 * 60 * 1000);
     
     // Проверяем, не завершен ли матч
     const finishedMatches = await getFinishedMatches();
     const isFinished = finishedMatches.some(fm => fm.id === matchId);
     if (isFinished) return false;
     
-    return Date.now() < oneHourBefore;
+    return Date.now() < fifteenMinutesBefore;
 }
 
 async function getMatchStatus(match) {
