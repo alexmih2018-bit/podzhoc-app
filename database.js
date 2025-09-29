@@ -413,6 +413,19 @@ class Database {
         });
     }
 
+    async updateMatchStatus(matchId, status) {
+        return new Promise((resolve, reject) => {
+            this.db.run(
+                'UPDATE matches SET status = ?, updatedAt = strftime("%s", "now") WHERE id = ?',
+                [status, matchId],
+                function(err) {
+                    if (err) reject(err);
+                    else resolve(this.changes);
+                }
+            );
+        });
+    }
+
     async finishMatch(matchId) {
         return new Promise((resolve, reject) => {
             // Получаем данные матча

@@ -1366,6 +1366,18 @@ async function updateMatchScore(matchId, scoreHome, scoreAway) {
     }
 }
 
+async function updateMatchStatus(matchId, status) {
+    if (db) {
+        return await db.updateMatchStatus(matchId, status);
+    } else {
+        const match = matchesCache.data.find(m => m.id == matchId);
+        if (match) {
+            match.status = status;
+        }
+        return match;
+    }
+}
+
 async function getFinishedMatches() {
     if (db) {
         return await db.getFinishedMatches();
@@ -1818,6 +1830,11 @@ app.post('/api/admin/match-result', checkAdminToken, (req, res) => {
             const finishedMatch = matchesCache.data.splice(matchIndex, 1)[0];
             finishedMatches.push(finishedMatch);
         }
+        
+        // Также обновляем в базе данных
+        if (db) {
+            await finishMatch(matchId);
+        }
 
         // Автоматически рассчитываем выигрыши
         const matchBets = bets.filter(b => b.matchId === matchId && b.status === 'active');
@@ -1936,6 +1953,35 @@ app.post('/api/admin/update-score', checkAdminToken, async (req, res) => {
     } catch (error) {
         console.error('❌ Ошибка обновления счета:', error);
         res.status(500).json({ success: false, error: 'Ошибка обновления счета' });
+    }
+});
+
+// API для обновления статуса матча
+app.post('/api/admin/update-status', checkAdminToken, async (req, res) => {
+    try {
+        const { matchId, status } = req.body;
+        
+        if (!matchId || !status) {
+            return res.status(400).json({ success: false, error: 'Необходимы matchId и status' });
+        }
+        
+        console.log(`📊 Обновление статуса матча ${matchId}: ${status}`);
+        
+        // Обновляем статус в базе данных или кэше
+        await updateMatchStatus(matchId, status);
+        
+        // Находим матч в кэше и обновляем
+        const matchIndex = matchesCache.data.findIndex(match => match.id === matchId);
+        if (matchIndex !== -1) {
+            matchesCache.data[matchIndex].status = status;
+        }
+        
+        console.log(`✅ Статус матча ${matchId} обновлен: ${status}`);
+
+        res.json({ success: true, message: 'Статус обновлен' });
+    } catch (error) {
+        console.error('❌ Ошибка обновления статуса:', error);
+        res.status(500).json({ success: false, error: 'Ошибка обновления статуса' });
     }
 });
 
