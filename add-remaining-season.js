@@ -105,3 +105,4 @@ console.log(`✅ Обновлен календарь КХЛ 2025-2026`);
 console.log(`📊 Всего матчей: ${fullCalendar.length}`);
 console.log(`➕ Добавлено новых матчей: ${additionalMatches.length}`);
 console.log(`📅 Период: ${fullCalendar[0].date} - ${fullCalendar[fullCalendar.length - 1].date}`);
+

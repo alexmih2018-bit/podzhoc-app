@@ -519,3 +519,4 @@ fs.writeFileSync('khl-full-calendar.js', jsCode);
 console.log('Полный календарь сохранен в khl-full-calendar.js');
 console.log(`Первые 5 матчей:`, allMatches.slice(0, 5));
 console.log(`Последние 5 матчей:`, allMatches.slice(-5));
+

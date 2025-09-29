@@ -1502,6 +1502,39 @@ app.post('/api/user/login', async (req, res) => {
     }
 });
 
+// API для получения данных пользователя
+app.get('/api/user/:telegramId', async (req, res) => {
+    try {
+        const { telegramId } = req.params;
+        
+        if (!telegramId) {
+            return res.status(400).json({ success: false, error: 'Необходим telegramId' });
+        }
+        
+        const user = await getUser(telegramId);
+        if (!user) {
+            return res.status(404).json({ success: false, error: 'Пользователь не найден' });
+        }
+        
+        res.json({ 
+            success: true, 
+            data: {
+                telegramId: user.telegramId,
+                username: user.username,
+                firstName: user.firstName,
+                balance: user.balance,
+                totalBets: user.totalBets,
+                wonBets: user.wonBets,
+                lastBonusTime: user.lastBonusTime
+            }
+        });
+        
+    } catch (error) {
+        console.error('❌ Ошибка получения данных пользователя:', error);
+        res.status(500).json({ success: false, error: 'Ошибка получения данных пользователя' });
+    }
+});
+
 app.post('/api/user/bonus', async (req, res) => {
     try {
         const { telegramId, bonusAmount } = req.body;
@@ -1643,6 +1676,7 @@ app.get('/api/leaderboard', async (req, res) => {
         } else {
             // Используем данные из памяти
             leaderboard = users
+                .filter(user => user.username !== 'anonymous' && user.username !== 'browser_user')
                 .map(user => ({
                     id: user.id,
                     firstName: user.firstName,

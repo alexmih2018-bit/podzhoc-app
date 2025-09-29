@@ -58,3 +58,4 @@ const KHL_CALENDAR_2025_2026 = [
 ];
 
 module.exports = KHL_CALENDAR_2025_2026;
+

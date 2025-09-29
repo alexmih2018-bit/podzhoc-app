@@ -413,7 +413,7 @@ class Database {
     async getLeaderboard() {
         return new Promise((resolve, reject) => {
             this.db.all(
-                'SELECT * FROM users ORDER BY balance DESC, wonBets DESC LIMIT 50',
+                'SELECT * FROM users WHERE username != "anonymous" AND username != "browser_user" ORDER BY balance DESC, wonBets DESC LIMIT 50',
                 (err, rows) => {
                     if (err) reject(err);
                     else resolve(rows);

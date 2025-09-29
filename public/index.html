@@ -2097,6 +2097,9 @@
                     
                     console.log('🔧 currentUser установлен:', currentUser);
                     
+                    // Загружаем данные пользователя из базы данных
+                    await loadUserFromDatabase();
+                    
                     // Показываем карточку пользователя
                     const profileCorner = document.getElementById('profile-corner');
                     const userAvatar = document.getElementById('user-avatar');
@@ -2218,6 +2221,38 @@
             } catch (error) {
                 console.error(`❌ API Error (${endpoint}):`, error);
                 throw error;
+            }
+        }
+
+        // Загрузка данных пользователя из базы данных
+        async function loadUserFromDatabase() {
+            try {
+                if (!currentUser) return;
+                
+                const response = await apiCall(`/user/${currentUser.id}`);
+                if (response.success && response.data) {
+                    // Обновляем данные пользователя из базы данных
+                    currentUser.balance = response.data.balance || 1000;
+                    currentUser.lastBonusTime = response.data.lastBonusTime || 0;
+                    currentUser.totalBets = response.data.totalBets || 0;
+                    currentUser.wonBets = response.data.wonBets || 0;
+                    
+                    console.log('✅ Данные пользователя загружены из БД:', currentUser);
+                    
+                    // Обновляем отображение баланса
+                    const balanceElement = document.getElementById('balance');
+                    if (balanceElement) {
+                        balanceElement.textContent = currentUser.balance;
+                    }
+                    
+                    // Обновляем таймер бонуса
+                    updateBonusTimer();
+                }
+            } catch (error) {
+                console.error('❌ Ошибка загрузки данных пользователя:', error);
+                // Устанавливаем значения по умолчанию
+                currentUser.balance = currentUser.balance || 1000;
+                currentUser.lastBonusTime = currentUser.lastBonusTime || 0;
             }
         }
 
