@@ -304,6 +304,84 @@
             color: #888;
         }
 
+        /* Стили для детальной статистики ставок */
+        .match-bets-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .match-bets-card h4 {
+            color: #4fc3f7;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .bets-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            color: #4fc3f7;
+            font-weight: bold;
+        }
+
+        .bets-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bet-item {
+            display: grid;
+            grid-template-columns: 1fr auto auto auto;
+            gap: 15px;
+            align-items: center;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .bet-type.home {
+            color: #4fc3f7;
+        }
+
+        .bet-type.away {
+            color: #ff6b35;
+        }
+
+        .status.active {
+            color: #4fc3f7;
+        }
+
+        .status.won {
+            color: #4caf50;
+        }
+
+        .status.lost {
+            color: #f44336;
+        }
+
         .error {
             color: #ff6b35;
             text-align: center;
@@ -398,6 +476,7 @@
         <!-- Вкладки -->
         <div class="tabs">
             <button class="tab active" onclick="switchTab('matches')">⚽ Матчи</button>
+            <button class="tab" onclick="switchTab('bets')">📊 Ставки</button>
             <button class="tab" onclick="switchTab('history')">📋 Прошедшие</button>
             <button class="tab" onclick="switchTab('leaderboard')">🏆 Таблица</button>
         </div>
@@ -446,6 +525,16 @@
                     <p style="margin-top: 10px; color: #888; font-size: 0.9rem;">
                         Сбросит все ставки и вернет баланс 1000 шайбочек всем пользователям
                     </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Вкладка Ставки -->
+        <div id="bets-tab" class="tab-content">
+            <div class="section">
+                <div class="section-title">📊 Детальная статистика ставок</div>
+                <div id="bets-details-container">
+                    <div class="loading">Загрузка статистики ставок...</div>
                 </div>
             </div>
         </div>
@@ -583,8 +672,77 @@
                 document.getElementById('active-bets').textContent = activeBets;
                 document.getElementById('total-users').textContent = users.length;
 
+                // Загружаем детальную статистику ставок
+                loadBetsDetails(bets);
+
             } catch (error) {
                 console.error('❌ Ошибка загрузки статистики:', error);
+            }
+        }
+
+        // Функция для детального просмотра ставок
+        async function loadBetsDetails(bets) {
+            try {
+                const container = document.getElementById('bets-details-container');
+                if (!container) return;
+
+                // Группируем ставки по матчам
+                const betsByMatch = {};
+                bets.forEach(bet => {
+                    const matchKey = `${bet.matchName || 'Неизвестный матч'}`;
+                    if (!betsByMatch[matchKey]) {
+                        betsByMatch[matchKey] = [];
+                    }
+                    betsByMatch[matchKey].push(bet);
+                });
+
+                let html = '<h3>📊 Детальная статистика ставок</h3>';
+                
+                Object.keys(betsByMatch).forEach(matchName => {
+                    const matchBets = betsByMatch[matchName];
+                    const totalAmount = matchBets.reduce((sum, bet) => sum + bet.amount, 0);
+                    const homeBets = matchBets.filter(bet => bet.betType === 'home');
+                    const awayBets = matchBets.filter(bet => bet.betType === 'away');
+                    
+                    html += `
+                        <div class="match-bets-card">
+                            <h4>${matchName}</h4>
+                            <div class="bets-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Всего ставок:</span>
+                                    <span class="stat-value">${matchBets.length}</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Общая сумма:</span>
+                                    <span class="stat-value">${totalAmount} 🏒</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">На хозяев:</span>
+                                    <span class="stat-value">${homeBets.length} (${homeBets.reduce((sum, bet) => sum + bet.amount, 0)} 🏒)</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">На гостей:</span>
+                                    <span class="stat-value">${awayBets.length} (${awayBets.reduce((sum, bet) => sum + bet.amount, 0)} 🏒)</span>
+                                </div>
+                            </div>
+                            <div class="bets-list">
+                                ${matchBets.map(bet => `
+                                    <div class="bet-item">
+                                        <span class="user">${bet.username || 'Аноним'}</span>
+                                        <span class="bet-type ${bet.betType}">${bet.betType === 'home' ? 'Хозяева' : 'Гости'}</span>
+                                        <span class="amount">${bet.amount} 🏒</span>
+                                        <span class="status ${bet.status}">${bet.status === 'active' ? 'Активна' : bet.status === 'won' ? 'Выиграла' : bet.status === 'lost' ? 'Проиграла' : 'Неизвестно'}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error('❌ Ошибка загрузки деталей ставок:', error);
             }
         }
 

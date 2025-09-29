@@ -202,12 +202,28 @@ class Database {
     async createOrUpdateUser(telegramId, username, firstName) {
         return new Promise((resolve, reject) => {
             this.db.run(
-                `INSERT OR REPLACE INTO users (telegramId, username, firstName, updatedAt) 
-                 VALUES (?, ?, ?, strftime('%s', 'now'))`,
-                [telegramId, username, firstName],
+                `INSERT OR REPLACE INTO users (telegramId, username, firstName, balance, totalBets, wonBets, lastBonusTime, updatedAt) 
+                 VALUES (?, ?, ?, COALESCE((SELECT balance FROM users WHERE telegramId = ?), 1000), 
+                         COALESCE((SELECT totalBets FROM users WHERE telegramId = ?), 0),
+                         COALESCE((SELECT wonBets FROM users WHERE telegramId = ?), 0),
+                         COALESCE((SELECT lastBonusTime FROM users WHERE telegramId = ?), 0),
+                         strftime('%s', 'now'))`,
+                [telegramId, username, firstName, telegramId, telegramId, telegramId, telegramId],
                 function(err) {
-                    if (err) reject(err);
-                    else resolve(this.lastID);
+                    if (err) {
+                        reject(err);
+                        return;
+                    }
+                    
+                    // Получаем полные данные созданного/обновленного пользователя
+                    this.db.get(
+                        'SELECT * FROM users WHERE telegramId = ?',
+                        [telegramId],
+                        (err, row) => {
+                            if (err) reject(err);
+                            else resolve(row);
+                        }
+                    );
                 }
             );
         });
