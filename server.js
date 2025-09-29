@@ -128,10 +128,8 @@ function getAllRealKHLMatches() {
         
         // Создаем дату матча - используем правильный год 2025 в московском времени
         const matchDate = new Date(2025, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
-        // Учитываем московскую временную зону (UTC+3)
-        const moscowOffset = 3 * 60; // 3 часа в минутах
-        const utcTime = matchDate.getTime() - (moscowOffset * 60 * 1000);
-        const moscowDate = new Date(utcTime);
+        // Создаем дату в московском времени (UTC+3)
+        const moscowDate = new Date(matchDate.getTime() + (3 * 60 * 60 * 1000));
         
         // Если матч уже прошел, пропускаем его
         if (moscowDate.getTime() < Date.now()) {
