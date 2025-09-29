@@ -3548,18 +3548,28 @@
             const bonusTimer = document.getElementById('bonus-timer');
             const profileOval = document.querySelector('.profile-oval');
             
+            // Проверяем, что элементы существуют
+            if (!bonusBtn || !bonusTimer) {
+                console.log('⚠️ Элементы бонуса не найдены, пропускаем обновление UI');
+                return;
+            }
+            
             if (bonusData.canClaim) {
                 bonusBtn.disabled = false;
                 bonusTimer.textContent = 'Доступно!';
                 bonusBtn.style.background = 'linear-gradient(135deg, #ff6b35, #f7931e)';
                 // Добавляем золотое свечение
-                profileOval.classList.add('bonus-available');
+                if (profileOval) {
+                    profileOval.classList.add('bonus-available');
+                }
             } else {
                 bonusBtn.disabled = true;
                 bonusTimer.textContent = bonusData.timeFormatted;
                 bonusBtn.style.background = 'linear-gradient(135deg, #6b7280, #9ca3af)';
                 // Убираем золотое свечение
-                profileOval.classList.remove('bonus-available');
+                if (profileOval) {
+                    profileOval.classList.remove('bonus-available');
+                }
             }
         }
 
