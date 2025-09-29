@@ -43,17 +43,17 @@ async function waitForDatabase() {
     
     console.log('⏳ Ожидание создания таблиц базы данных...');
     
-    // Ждем 3 секунды для создания таблиц
-    await new Promise(resolve => setTimeout(resolve, 3000));
+    // Ждем 5 секунд для создания таблиц
+    await new Promise(resolve => setTimeout(resolve, 5000));
     
     let attempts = 0;
-    const maxAttempts = 10; // 10 попыток по 1 секунде = 10 секунд максимум
+    const maxAttempts = 15; // 15 попыток по 1 секунде = 15 секунд максимум
     
     while (attempts < maxAttempts) {
         try {
-            // Пробуем выполнить простой запрос к таблице matches
+            // Пробуем выполнить простой запрос к таблице users (которая точно должна быть)
             await new Promise((resolve, reject) => {
-                db.get('SELECT COUNT(*) as count FROM matches', (err, row) => {
+                db.get('SELECT COUNT(*) as count FROM users', (err, row) => {
                     if (err) {
                         reject(err);
                     } else {
@@ -71,7 +71,6 @@ async function waitForDatabase() {
     }
     
     console.log('⚠️ База данных не готова, продолжаем в режиме памяти');
-    db = null;
 }
 
 const app = express();
