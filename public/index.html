@@ -3246,8 +3246,19 @@
             
             // Фильтруем матчи на ближайшие 24 часа
             const availableMatches = matchesCache.data.filter(match => {
-                const matchDate = new Date(match.startTime);
-                return matchDate >= now && matchDate <= next24Hours && canBetOnMatch(match);
+                // Используем timestamp для точного сравнения
+                const matchTime = match.startTime;
+                const nowTime = now.getTime();
+                const next24HoursTime = next24Hours.getTime();
+                
+                console.log(`🔍 Матч ${match.teamHome} vs ${match.teamAway}:`, {
+                    matchTime: new Date(matchTime).toLocaleString('ru-RU', {timeZone: 'Europe/Moscow'}),
+                    nowTime: new Date(nowTime).toLocaleString('ru-RU', {timeZone: 'Europe/Moscow'}),
+                    timeOk: matchTime >= nowTime && matchTime <= next24HoursTime,
+                    canBet: canBetOnMatch(match)
+                });
+                
+                return matchTime >= nowTime && matchTime <= next24HoursTime && canBetOnMatch(match);
             });
             
             console.log(`🎯 Загружено матчей для ставок (24 часа): ${availableMatches.length}`);
@@ -3269,8 +3280,18 @@
             
             // Фильтруем матчи на ближайшие 48 часов
             const allMatches = matchesCache.data.filter(match => {
-                const matchDate = new Date(match.startTime);
-                return matchDate >= now && matchDate <= next48Hours;
+                // Используем timestamp для точного сравнения
+                const matchTime = match.startTime;
+                const nowTime = now.getTime();
+                const next48HoursTime = next48Hours.getTime();
+                
+                console.log(`📅 Матч ${match.teamHome} vs ${match.teamAway}:`, {
+                    matchTime: new Date(matchTime).toLocaleString('ru-RU', {timeZone: 'Europe/Moscow'}),
+                    nowTime: new Date(nowTime).toLocaleString('ru-RU', {timeZone: 'Europe/Moscow'}),
+                    timeOk: matchTime >= nowTime && matchTime <= next48HoursTime
+                });
+                
+                return matchTime >= nowTime && matchTime <= next48HoursTime;
             });
             
             console.log(`📅 Загружено всех матчей (48 часов): ${allMatches.length}`);
