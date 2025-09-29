@@ -2592,11 +2592,13 @@
         // Загрузка истории ставок
         async function loadHistory() {
             try {
+                console.log('📋 Загружаем историю завершенных матчей...');
                 const container = document.getElementById('history-container');
                 
                 // Загружаем завершенные матчи
                 const response = await apiCall('/matches/finished');
                 const finishedMatches = response.data || [];
+                console.log('📋 Получено завершенных матчей:', finishedMatches.length);
                 
                 if (finishedMatches.length === 0) {
                     container.innerHTML = `
