@@ -2285,7 +2285,7 @@
                 }
                 
                 console.log(`📋 Загружаем ставки для пользователя ${currentUser.id + '.0'}`);
-                const response = await apiCall(`/user/bets?telegramId=${currentUser.id + '.0'}`);
+                const response = await apiCall(`/user-bets?telegramId=${currentUser.id + '.0'}`);
                 console.log('📋 Ответ API ставок:', response);
                 return response.data || [];
             } catch (error) {
@@ -2597,7 +2597,7 @@
                     return;
                 }
                 
-                const response = await apiCall(`/user/bets?userId=${currentUser.id + '.0'}`);
+                const response = await apiCall(`/user-bets?telegramId=${currentUser.id + '.0'}`);
                 const bets = response.data || [];
                 
                 const container = document.getElementById('history-container');
@@ -2705,7 +2705,7 @@
             if (!currentUser) return [];
             
             try {
-                const response = await apiCall(`/user/bets?telegramId=${currentUser.id + '.0'}`);
+                const response = await apiCall(`/user-bets?telegramId=${currentUser.id + '.0'}`);
                 if (response.success) {
                     userBets = response.data || [];
                     console.log('🎯 Загружены ставки с сервера:', userBets);

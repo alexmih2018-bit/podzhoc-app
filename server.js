@@ -1700,7 +1700,7 @@ app.get('/api/leaderboard', async (req, res) => {
 });
 
 // API для получения истории ставок пользователя
-app.get('/api/user/bets', async (req, res) => {
+app.get('/api/user-bets', async (req, res) => {
     try {
         const telegramId = req.query.telegramId;
         
