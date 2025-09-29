@@ -440,7 +440,7 @@ class Database {
                         // Удаляем из активных матчей
                         this.db.run('DELETE FROM matches WHERE id = ?', [matchId], (err) => {
                             if (err) reject(err);
-                            else resolve();
+                            else resolve(match); // Возвращаем данные матча
                         });
                     }
                 );

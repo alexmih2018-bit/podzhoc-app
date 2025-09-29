@@ -2592,56 +2592,48 @@
         // Загрузка истории ставок
         async function loadHistory() {
             try {
-                if (!currentUser) {
-                    document.getElementById('history-container').innerHTML = '<div class="error">Необходима авторизация</div>';
-                    return;
-                }
-                
-                const response = await apiCall(`/user-bets?telegramId=${currentUser.id + '.0'}`);
-                const bets = response.data || [];
-                
                 const container = document.getElementById('history-container');
                 
-                if (bets.length === 0) {
+                // Загружаем завершенные матчи
+                const response = await apiCall('/matches/finished');
+                const finishedMatches = response.data || [];
+                
+                if (finishedMatches.length === 0) {
                     container.innerHTML = `
                         <div class="empty-state">
-                            <div class="empty-state-icon">📋</div>
-                            <div>У вас пока нет ставок</div>
+                            <div class="empty-state-icon">🏒</div>
+                            <div>Нет завершенных матчей</div>
                         </div>
                     `;
                     return;
                 }
 
-                const historyHTML = bets.map(bet => {
-                    const betDate = new Date(bet.createdAt);
-                    const formattedDate = betDate.toLocaleString('ru-RU', {
-                    day: 'numeric',
-                    month: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    timeZone: 'Europe/Moscow'
-                });
+                const historyHTML = finishedMatches.map(match => {
+                    const matchDate = new Date(match.startTime);
+                    const formattedDate = matchDate.toLocaleString('ru-RU', {
+                        day: 'numeric',
+                        month: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        timeZone: 'Europe/Moscow'
+                    });
 
-                    const resultClass = bet.status === 'won' ? 'bet-won' : bet.status === 'lost' ? 'bet-lost' : '';
-                    const resultText = bet.status === 'won' ? 'Выиграл' : bet.status === 'lost' ? 'Проиграл' : 'Ожидает';
-
-                return `
+                    return `
                         <div class="history-item">
                             <div class="history-header">
-                                <div class="history-teams">${bet.matchName}</div>
+                                <div class="history-teams">${match.teamHome} vs ${match.teamAway}</div>
                                 <div class="history-date">${formattedDate}</div>
-                        </div>
+                            </div>
                             <div class="history-result">
-                                <div class="history-score">${bet.scoreHome || 0} : ${bet.scoreAway || 0}</div>
-                                <div class="bet-result ${resultClass}">${resultText}</div>
-                        </div>
+                                <div class="history-score">${match.scoreHome} : ${match.scoreAway}</div>
+                                <div class="bet-result bet-finished">Завершен</div>
+                            </div>
                             <div style="margin-top: 10px; color: var(--gray); font-size: 0.9rem;">
-                                Ставка: ${bet.amount} шайбочек на ${bet.team === 'home' ? 'хозяев' : 'гостей'}
-                                ${bet.winnings ? ` | Выигрыш: ${bet.winnings} шайбочек` : ''}
+                                ${match.league || 'КХЛ 2025-2026'}
+                            </div>
                         </div>
-                    </div>
-                `;
-            }).join('');
+                    `;
+                }).join('');
 
                 container.innerHTML = historyHTML;
 
@@ -3285,20 +3277,27 @@
             const next48Hours = new Date(now);
             next48Hours.setHours(next48Hours.getHours() + 48);
             
-            // Фильтруем матчи на ближайшие 48 часов
+            // Фильтруем матчи на ближайшие 48 часов (включая live матчи)
             const allMatches = matchesCache.data.filter(match => {
                 // Используем timestamp для точного сравнения
                 const matchTime = match.startTime;
                 const nowTime = now.getTime();
                 const next48HoursTime = next48Hours.getTime();
                 
+                // Включаем матчи, которые начались в последние 3 часа (live) или начинаются в ближайшие 48 часов
+                const threeHoursAgo = nowTime - (3 * 60 * 60 * 1000);
+                const isLive = matchTime >= threeHoursAgo && matchTime <= nowTime;
+                const isUpcoming = matchTime >= nowTime && matchTime <= next48HoursTime;
+                
                 console.log(`📅 Матч ${match.teamHome} vs ${match.teamAway}:`, {
                     matchTime: new Date(matchTime).toLocaleString('ru-RU', {timeZone: 'Europe/Moscow'}),
                     nowTime: new Date(nowTime).toLocaleString('ru-RU', {timeZone: 'Europe/Moscow'}),
-                    timeOk: matchTime >= nowTime && matchTime <= next48HoursTime
+                    isLive: isLive,
+                    isUpcoming: isUpcoming,
+                    timeOk: isLive || isUpcoming
                 });
                 
-                return matchTime >= nowTime && matchTime <= next48HoursTime;
+                return isLive || isUpcoming;
             });
             
             console.log(`📅 Загружено всех матчей (48 часов): ${allMatches.length}`);

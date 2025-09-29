@@ -124,11 +124,15 @@ function getAllRealKHLMatches() {
         const currentMonth = now.getMonth();
         const currentDay = now.getDate();
         
-        // Создаем дату матча - используем правильный год 2025
+        // Создаем дату матча - используем правильный год 2025 в московском времени
         const matchDate = new Date(2025, parseInt(month) - 1, parseInt(day), parseInt(hour), parseInt(minute));
+        // Учитываем московскую временную зону (UTC+3)
+        const moscowOffset = 3 * 60; // 3 часа в минутах
+        const utcTime = matchDate.getTime() - (moscowOffset * 60 * 1000);
+        const moscowDate = new Date(utcTime);
         
         // Если матч уже прошел, пропускаем его
-        if (matchDate.getTime() < Date.now()) {
+        if (moscowDate.getTime() < Date.now()) {
             continue;
         }
         
@@ -138,10 +142,10 @@ function getAllRealKHLMatches() {
             teamAway: matchData.away,
             scoreHome: 0,
             scoreAway: 0,
-            date: matchDate.toISOString().replace('T', ' ').substring(0, 16),
+            date: moscowDate.toISOString().replace('T', ' ').substring(0, 16),
             status: 'scheduled',
             league: 'КХЛ 2025-2026',
-            startTime: matchDate.getTime(),
+            startTime: moscowDate.getTime(),
             venue: getKHLVenue(matchData.home),
             isRealData: true,
             source: 'khl_official_calendar',
