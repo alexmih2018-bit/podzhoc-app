@@ -135,8 +135,12 @@ function getAllRealKHLMatches() {
             continue;
         }
         
-        // Создаем уникальный ID на основе команд и времени для предотвращения дублей
-        const uniqueId = `${matchData.home}_${matchData.away}_${moscowDate.getTime()}`.replace(/\s+/g, '_');
+        // Создаем числовой ID на основе хеша команд и времени для предотвращения дублей
+        const uniqueString = `${matchData.home}_${matchData.away}_${moscowDate.getTime()}`;
+        const uniqueId = Math.abs(uniqueString.split('').reduce((a, b) => {
+            a = ((a << 5) - a) + b.charCodeAt(0);
+            return a & a;
+        }, 0));
         
         const match = {
             id: uniqueId,
@@ -1348,10 +1352,11 @@ async function saveMatches(matches) {
 async function clearDuplicateMatches() {
     if (db) {
         try {
-            await db.clearDuplicateMatches();
-            console.log('🧹 Очищены дублирующиеся матчи из базы данных');
+            // Сначала полностью очищаем таблицу матчей для перезапуска
+            await db.clearAllMatches();
+            console.log('🧹 Очищены все матчи из базы данных для перезапуска');
         } catch (error) {
-            console.log('⚠️ Ошибка очистки дублей:', error.message);
+            console.log('⚠️ Ошибка очистки матчей:', error.message);
         }
     }
 }

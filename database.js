@@ -406,11 +406,21 @@ class Database {
             this.db.run(`
                 DELETE FROM matches 
                 WHERE id NOT IN (
-                    SELECT MAX(id) 
+                    SELECT MAX(updatedAt) 
                     FROM matches 
                     GROUP BY teamHome, teamAway, startTime
                 )
             `, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
+    async clearAllMatches() {
+        return new Promise((resolve, reject) => {
+            // Полностью очищаем таблицу матчей
+            this.db.run('DELETE FROM matches', (err) => {
                 if (err) reject(err);
                 else resolve();
             });
