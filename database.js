@@ -400,6 +400,23 @@ class Database {
         });
     }
 
+    async clearDuplicateMatches() {
+        return new Promise((resolve, reject) => {
+            // Удаляем дубли, оставляя только самую новую запись для каждой комбинации команд и времени
+            this.db.run(`
+                DELETE FROM matches 
+                WHERE id NOT IN (
+                    SELECT MAX(id) 
+                    FROM matches 
+                    GROUP BY teamHome, teamAway, startTime
+                )
+            `, (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
     async updateMatchScore(matchId, scoreHome, scoreAway) {
         return new Promise((resolve, reject) => {
             this.db.run(

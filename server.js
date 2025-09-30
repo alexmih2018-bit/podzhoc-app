@@ -135,8 +135,11 @@ function getAllRealKHLMatches() {
             continue;
         }
         
+        // Создаем уникальный ID на основе команд и времени для предотвращения дублей
+        const uniqueId = `${matchData.home}_${matchData.away}_${moscowDate.getTime()}`.replace(/\s+/g, '_');
+        
         const match = {
-            id: matchId++,
+            id: uniqueId,
             teamHome: matchData.home,
             teamAway: matchData.away,
             scoreHome: 0,
@@ -1332,10 +1335,24 @@ async function getUserBets(telegramId) {
 // Функции для работы с матчами
 async function saveMatches(matches) {
     if (db) {
+        // Сначала очищаем дубли в базе данных
+        await clearDuplicateMatches();
         return await db.saveMatches(matches);
     } else {
         // В режиме памяти матчи уже в кэше
         return;
+    }
+}
+
+// Функция для очистки дублирующихся матчей
+async function clearDuplicateMatches() {
+    if (db) {
+        try {
+            await db.clearDuplicateMatches();
+            console.log('🧹 Очищены дублирующиеся матчи из базы данных');
+        } catch (error) {
+            console.log('⚠️ Ошибка очистки дублей:', error.message);
+        }
     }
 }
 
