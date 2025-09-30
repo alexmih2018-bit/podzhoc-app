@@ -64,7 +64,7 @@
         }
 
         body {
-            background: url('images/backgrounds/hockey_field.png?v=13') center/cover no-repeat fixed;
+            background: url('images/backgrounds/hockey_field.png?v=14') center/cover no-repeat fixed;
             background-color: rgba(0, 0, 0, 0.4);
             background-blend-mode: multiply;
             color: white;
@@ -3209,9 +3209,19 @@
             else if (team.includes('металлург') || team.includes('metallurg')) teamFolder = 'metallurg';
             else if (team.includes('ска')) teamFolder = 'ska';
             else if (team.includes('торпедо') || team.includes('torpedo')) teamFolder = 'torpedo';
+            else if (team.includes('автомобилист') || team.includes('avtomobilist')) teamFolder = 'avtomobilist';
+            else if (team.includes('барыс') || team.includes('barys')) teamFolder = 'bars';
+            else if (team.includes('лада') || team.includes('lada')) teamFolder = 'lada';
+            else if (team.includes('нефтехимик') || team.includes('neftekhimik')) teamFolder = 'neftekhimik';
+            else if (team.includes('северсталь') || team.includes('severstal')) teamFolder = 'sevrestal';
+            else if (team.includes('сибирь') || team.includes('sibir')) teamFolder = 'sibir';
+            else if (team.includes('сочи') || team.includes('sochi')) teamFolder = 'sochi';
+            else if (team.includes('трактор') || team.includes('traktor')) teamFolder = 'traktor';
             
             const location = isHome ? 'home' : 'away';
-            return `images/teams/${teamFolder}/${location}/card.png`;
+            const cardPath = `images/teams/${teamFolder}/${location}/card.png`;
+            console.log(`🎯 Карточка команды "${teamName}" (${isHome ? 'home' : 'away'}): ${cardPath}`);
+            return cardPath;
         }
 
         // Получение пути к кнопке ставки команды
@@ -3243,6 +3253,9 @@
             else if (team.includes('трактор') || team.includes('traktor')) teamFolder = 'traktor';
             
             console.log(`🔍 Поиск кнопки ставки для команды "${teamName}" -> папка: ${teamFolder}`);
+            if (teamName.toLowerCase().includes('трактор') || teamName.toLowerCase().includes('traktor')) {
+                console.log(`🚨 ТРАКТОР НАЙДЕН! Команда: "${teamName}", папка: ${teamFolder}`);
+            }
             
             // Проверяем, существует ли файл кнопки ставки
             const buttonPath = `images/bet_buttons/${teamFolder}.png`;
@@ -3280,6 +3293,9 @@
             else if (team.includes('трактор') || team.includes('traktor')) teamFile = 'traktor';
             
             console.log(`🔍 Поиск логотипа для команды "${teamName}" -> файл: ${teamFile}`);
+            if (teamName.toLowerCase().includes('трактор') || teamName.toLowerCase().includes('traktor')) {
+                console.log(`🚨 ТРАКТОР НАЙДЕН! Команда: "${teamName}", файл: ${teamFile}`);
+            }
             
             // Используем кнопки из папки bet_buttons
             const logoPath = `images/bet_buttons/${teamFile}.png`;
