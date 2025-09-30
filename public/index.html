@@ -64,7 +64,7 @@
         }
 
         body {
-            background: url('images/backgrounds/hockey_field.png?v=14') center/cover no-repeat fixed;
+            background: url('images/backgrounds/hockey_field.png?v=15') center/cover no-repeat fixed;
             background-color: rgba(0, 0, 0, 0.4);
             background-blend-mode: multiply;
             color: white;
@@ -3219,7 +3219,7 @@
             else if (team.includes('трактор') || team.includes('traktor')) teamFolder = 'traktor';
             
             const location = isHome ? 'home' : 'away';
-            const cardPath = `images/teams/${teamFolder}/${location}/card.png`;
+            const cardPath = `images/teams/${teamFolder}/${location}/card.png?v=15`;
             console.log(`🎯 Карточка команды "${teamName}" (${isHome ? 'home' : 'away'}): ${cardPath}`);
             return cardPath;
         }
