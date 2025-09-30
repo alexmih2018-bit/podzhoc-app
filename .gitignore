@@ -11,9 +11,9 @@ yarn-error.log*
 .env.test.local
 .env.production.local
 
-# База данных
+# База данных (НЕ исключаем podzhoc.db - это наша рабочая база)
 *.sqlite
-*.db
+# *.db - включаем основную базу данных в git
 
 # Логи
 logs

@@ -64,7 +64,7 @@
         }
 
         body {
-            background: url('images/backgrounds/hockey_field.jpg') center/cover no-repeat fixed;
+            background: url('images/backgrounds/hockey_field.png?v=10') center/cover no-repeat fixed;
             background-color: rgba(0, 0, 0, 0.4);
             background-blend-mode: multiply;
             color: white;
@@ -1815,7 +1815,7 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
-        .match-card, .bet-card, .user-card {
+        .bet-card, .user-card {
             animation: fadeInUp 0.6s ease-out;
         }
 
@@ -2265,25 +2265,31 @@
             if (balanceElement) balanceElement.textContent = currentUser.balance;
                 } else {
                     console.log('❌ Данные пользователя не найдены, создаем анонимного пользователя');
-                    // Создаем анонимного пользователя
+                    // Создаем анонимного пользователя с сохранением ID в localStorage
+                    const savedUserId = localStorage.getItem('testUserId');
                     currentUser = {
-                        id: Date.now(), // Уникальный ID на основе времени
+                        id: savedUserId ? parseInt(savedUserId) : 1759162823434, // Фиксированный ID для тестирования
                         username: 'anonymous',
                         first_name: 'Игрок',
                         last_name: '',
                         balance: 1000 // Начальный баланс
                     };
+                    // Сохраняем ID для будущих сессий
+                    localStorage.setItem('testUserId', currentUser.id.toString());
                 }
             } else {
-                console.log('🔧 Telegram WebApp не найден, создаем анонимного пользователя');
-                // Для тестирования в браузере
+                console.log('🔧 Telegram WebApp не найден, создаем тестового пользователя');
+                // Для тестирования в браузере - используем фиксированный ID
+                const savedUserId = localStorage.getItem('testUserId');
                 currentUser = {
-                    id: Date.now(),
+                    id: savedUserId ? parseInt(savedUserId) : 1759162823434, // Фиксированный ID для тестирования
                     username: 'browser_user',
                     first_name: 'Игрок',
                     last_name: '',
                     balance: 1000 // Начальный баланс
                 };
+                // Сохраняем ID для будущих сессий
+                localStorage.setItem('testUserId', currentUser.id.toString());
             }
             
             // Показываем карточку пользователя
@@ -3554,7 +3560,6 @@
                     <div class="teams-section">
                         <div class="team-section home-team">
                             <div class="team-logo-container">
-                                <div class="team-name">${match.teamHome}</div>
                                 <img src="${homeLogoPath}" alt="${match.teamHome}" class="team-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div class="team-logo-fallback" style="display: none;">🏒</div>
                             </div>
@@ -3566,7 +3571,6 @@
                         
                         <div class="team-section away-team">
                             <div class="team-logo-container">
-                                <div class="team-name">${match.teamAway}</div>
                                 <img src="${awayLogoPath}" alt="${match.teamAway}" class="team-logo" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
                                 <div class="team-logo-fallback" style="display: none;">🏒</div>
                             </div>
