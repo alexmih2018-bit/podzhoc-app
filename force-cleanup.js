@@ -10,7 +10,12 @@ async function forceCleanup() {
         
         console.log(`🗑️ Удаляем матчи старше ${today.toLocaleDateString('ru-RU')}...`);
         
-        const result = await db.run('DELETE FROM matches WHERE startTime < ?', [todayStart]);
+        const result = await new Promise((resolve, reject) => {
+            db.db.run('DELETE FROM matches WHERE startTime < ?', [todayStart], function(err) {
+                if (err) reject(err);
+                else resolve({ changes: this.changes });
+            });
+        });
         
         console.log(`✅ Удалено ${result.changes} старых матчей`);
         
