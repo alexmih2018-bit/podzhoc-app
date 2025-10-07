@@ -1813,21 +1813,62 @@ app.get('/api/user-bets', async (req, res) => {
 // ==================== АДМИН-ПАНЕЛЬ ====================
 
 // API для получения всех ставок (для админа)
-app.get('/api/admin/bets', checkAdminToken, (req, res) => {
+app.get('/api/admin/bets', checkAdminToken, async (req, res) => {
     try {
-        const allBets = bets.map(bet => {
-            const user = users.find(u => u.telegramId === bet.telegramId);
-            const match = matchesCache.data.find(m => m.id === bet.matchId);
+        let allBets = [];
+        
+        // Получаем ставки из базы данных
+        if (db) {
+            try {
+                allBets = await db.getAllBets();
+                console.log(`📊 Загружено ${allBets.length} ставок из базы данных для админа`);
+            } catch (error) {
+                console.log('⚠️ Ошибка получения ставок из БД, используем данные в памяти:', error.message);
+                allBets = bets;
+            }
+        } else {
+            console.log('⚠️ База данных недоступна, используем данные в памяти');
+            allBets = bets;
+        }
+        
+        // Получаем завершенные матчи для корректного отображения
+        const finishedMatches = await getFinishedMatches();
+        
+        // Обогащаем ставки информацией о пользователях и матчах
+        const enrichedBets = await Promise.all(allBets.map(async bet => {
+            // Получаем пользователя
+            let user;
+            if (db) {
+                try {
+                    user = await getUser(bet.telegramId);
+                } catch (error) {
+                    console.log(`⚠️ Ошибка получения пользователя ${bet.telegramId}:`, error.message);
+                    user = users.find(u => u.telegramId === bet.telegramId);
+                }
+            } else {
+                user = users.find(u => u.telegramId === bet.telegramId);
+            }
+            
+            // Получаем матч
+            let match = matchesCache.data.find(m => m.id === bet.matchId);
+            if (!match) {
+                match = finishedMatches.find(m => m.id === bet.matchId);
+            }
+            
             return {
                 ...bet,
-                userName: user ? user.firstName : 'Неизвестный',
+                username: user ? (user.firstName || user.username || 'Аноним') : 'Неизвестный',
+                userName: user ? (user.firstName || user.username || 'Аноним') : 'Неизвестный',
                 matchName: match ? `${match.teamHome} vs ${match.teamAway}` : 'Матч не найден',
-                matchDate: match ? match.date : null
+                matchDate: match ? match.date : null,
+                matchTime: match ? match.startTime : null
             };
-        });
+        }));
         
-        res.json({ success: true, data: allBets });
+        console.log(`📊 Возвращаем ${enrichedBets.length} ставок для админской панели`);
+        res.json({ success: true, data: enrichedBets });
     } catch (error) {
+        console.error('❌ Ошибка загрузки ставок для админа:', error);
         res.status(500).json({ success: false, error: 'Ошибка загрузки ставок' });
     }
 });
