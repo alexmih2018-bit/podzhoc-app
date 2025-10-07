@@ -102,7 +102,28 @@ function getAllRealKHLMatches() {
     const matches = [];
     let matchId = 1;
     
-    // Тестовый матч убран по запросу пользователя
+    // Добавляем тестовый матч на сегодня (7 октября 2025)
+    const today = new Date();
+    const todayStr = today.toLocaleDateString('ru-RU', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    console.log(`🧪 Сегодня: ${todayStr}`);
+    
+    const testMatch = {
+        id: 999999,
+        teamHome: 'Амур',
+        teamAway: 'Адмирал',
+        scoreHome: 0,
+        scoreAway: 0,
+        date: todayStr,
+        startTime: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 20, 0).getTime(), // 23:00 по Москве
+        status: 'scheduled',
+        venue: 'Арена КХЛ',
+        league: 'КХЛ 2025-2026',
+        isRealData: 0,
+        source: 'test_match'
+    };
+    
+    matches.push(testMatch);
+    console.log('🧪 Добавлен тестовый матч на сегодня:', testMatch);
     
     // Загружаем полный календарь КХЛ 2025-2026 из отдельного файла
     let calendarData = [];
@@ -1204,7 +1225,7 @@ function getTimeUntilBettingCloses(matchStartTime) {
 
 let matchesCache = {
     data: [],
-    lastUpdated: 0,
+    lastUpdated: 0, // Принудительно очищаем кэш для загрузки свежих матчей
     ttl: CONFIG.UPDATE_INTERVAL
 };
 
