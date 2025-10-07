@@ -2020,38 +2020,86 @@ app.post('/api/admin/match-result', checkAdminToken, async (req, res) => {
         await loadMatches();
 
         // Автоматически рассчитываем выигрыши
-        const matchBets = bets.filter(b => b.matchId === matchId && b.status === 'active');
         let processedBets = 0;
         let totalWinnings = 0;
 
-        matchBets.forEach(bet => {
-            const user = users.find(u => u.telegramId === bet.telegramId);
-            if (!user) return;
+        if (db) {
+            try {
+                // Получаем все активные ставки на этот матч из базы данных
+                const matchBets = await db.getMatchBets(matchId);
+                console.log(`📊 Найдено ${matchBets.length} ставок на матч ${matchId}`);
+                
+                for (const bet of matchBets) {
+                    if (bet.status !== 'active') continue;
+                    
+                    console.log(`🎯 Обрабатываем ставку ${bet.id}: ${bet.betType} на ${bet.amount}`);
+                    
+                    let isWin = false;
+                    
+                    if (bet.betType === 'home' && result.winner === 'home') {
+                        isWin = true;
+                    } else if (bet.betType === 'away' && result.winner === 'away') {
+                        isWin = true;
+                    } else if (bet.betType === 'draw' && result.winner === 'draw') {
+                        isWin = true;
+                    }
 
-            let isWin = false;
+                    if (isWin) {
+                        const winnings = bet.amount * 2; // Коэффициент 2.0
+                        console.log(`💰 Выигрыш: ${winnings} для пользователя ${bet.telegramId}`);
+                        
+                        // Обновляем баланс пользователя в базе данных
+                        await db.updateUserBalance(bet.telegramId, bet.amount + winnings); // Возвращаем ставку + выигрыш
+                        await db.incrementWonBets(bet.telegramId);
+                        
+                        // Обновляем статус ставки
+                        await db.updateBetStatus(bet.id, 'won', winnings);
+                        
+                        totalWinnings += winnings;
+                    } else {
+                        console.log(`❌ Проигрыш для пользователя ${bet.telegramId}`);
+                        // Обновляем статус ставки
+                        await db.updateBetStatus(bet.id, 'lost', 0);
+                    }
+                    
+                    processedBets++;
+                }
+            } catch (error) {
+                console.error('❌ Ошибка расчета ставок в БД:', error);
+            }
+        } else {
+            // Fallback для режима в памяти
+            const matchBets = bets.filter(b => b.matchId === matchId && b.status === 'active');
             
-            if (bet.betType === 'home' && result.winner === 'home') {
-                isWin = true;
-            } else if (bet.betType === 'away' && result.winner === 'away') {
-                isWin = true;
-            } else if (bet.betType === 'draw' && result.winner === 'draw') {
-                isWin = true;
-            }
+            matchBets.forEach(bet => {
+                const user = users.find(u => u.telegramId === bet.telegramId);
+                if (!user) return;
 
-            if (isWin) {
-                const winnings = bet.amount * 2; // Коэффициент 2.0
-                user.balance += winnings;
-                user.wonBets += 1;
-                totalWinnings += winnings;
-                bet.status = 'won';
-                bet.winnings = winnings;
-            } else {
-                bet.status = 'lost';
-            }
+                let isWin = false;
+                
+                if (bet.betType === 'home' && result.winner === 'home') {
+                    isWin = true;
+                } else if (bet.betType === 'away' && result.winner === 'away') {
+                    isWin = true;
+                } else if (bet.betType === 'draw' && result.winner === 'draw') {
+                    isWin = true;
+                }
 
-            bet.processedAt = new Date().toISOString();
-            processedBets++;
-        });
+                if (isWin) {
+                    const winnings = bet.amount * 2; // Коэффициент 2.0
+                    user.balance += winnings;
+                    user.wonBets += 1;
+                    totalWinnings += winnings;
+                    bet.status = 'won';
+                    bet.winnings = winnings;
+                } else {
+                    bet.status = 'lost';
+                }
+
+                bet.processedAt = new Date().toISOString();
+                processedBets++;
+            });
+        }
 
         res.json({
             success: true,

@@ -45,6 +45,8 @@ class Database {
                 amount INTEGER NOT NULL,
                 status TEXT DEFAULT 'active',
                 potentialWin INTEGER,
+                winnings INTEGER DEFAULT 0,
+                processedAt TEXT,
                 createdAt INTEGER DEFAULT (strftime('%s', 'now'))
             )`,
             
@@ -95,8 +97,31 @@ class Database {
                 completed++;
                 if (completed === totalTables) {
                     console.log('✅ Все таблицы базы данных созданы');
+                    // Выполняем миграции
+                    this.runMigrations();
                 }
             });
+        });
+    }
+
+    runMigrations() {
+        console.log('🔄 Выполняем миграции базы данных...');
+        
+        // Миграция: добавляем недостающие колонки в таблицу bets
+        this.db.run(`ALTER TABLE bets ADD COLUMN winnings INTEGER DEFAULT 0`, (err) => {
+            if (err && !err.message.includes('duplicate column name')) {
+                console.error('❌ Ошибка добавления колонки winnings:', err.message);
+            } else if (!err) {
+                console.log('✅ Колонка winnings добавлена');
+            }
+        });
+        
+        this.db.run(`ALTER TABLE bets ADD COLUMN processedAt TEXT`, (err) => {
+            if (err && !err.message.includes('duplicate column name')) {
+                console.error('❌ Ошибка добавления колонки processedAt:', err.message);
+            } else if (!err) {
+                console.log('✅ Колонка processedAt добавлена');
+            }
         });
     }
 
@@ -336,11 +361,33 @@ class Database {
         });
     }
 
-    async updateBetStatus(betId, status) {
+    async updateBetStatus(betId, status, winnings = 0) {
         return new Promise((resolve, reject) => {
             this.db.run(
-                'UPDATE bets SET status = ? WHERE id = ?',
-                [status, betId],
+                'UPDATE bets SET status = ?, winnings = ?, processedAt = ? WHERE id = ?',
+                [status, winnings, new Date().toISOString(), betId],
+                function(err) {
+                    if (err) reject(err);
+                    else resolve(this.changes);
+                }
+            );
+        });
+    }
+
+    async getMatchBets(matchId) {
+        return new Promise((resolve, reject) => {
+            this.db.all('SELECT * FROM bets WHERE matchId = ?', [matchId], (err, rows) => {
+                if (err) reject(err);
+                else resolve(rows);
+            });
+        });
+    }
+
+    async incrementWonBets(telegramId) {
+        return new Promise((resolve, reject) => {
+            this.db.run(
+                'UPDATE users SET wonBets = wonBets + 1 WHERE telegramId = ?',
+                [telegramId],
                 function(err) {
                     if (err) reject(err);
                     else resolve(this.changes);

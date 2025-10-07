@@ -2442,7 +2442,7 @@
                     response = await apiCall('/user/login', {
                         method: 'POST',
                         body: JSON.stringify({
-                            telegramId: currentUser.id + '.0',
+                            telegramId: currentUser.id,
                             firstName: currentUser.first_name || currentUser.username || 'Игрок',
                             username: currentUser.username
                         })
@@ -2483,8 +2483,8 @@
                     return [];
                 }
                 
-                console.log(`📋 Загружаем ставки для пользователя ${currentUser.id + '.0'}`);
-                const response = await apiCall(`/user-bets?telegramId=${currentUser.id + '.0'}`);
+                console.log(`📋 Загружаем ставки для пользователя ${currentUser.id}`);
+                const response = await apiCall(`/user-bets?telegramId=${currentUser.id}`);
                 console.log('📋 Ответ API ставок:', response);
                 return response.data || [];
             } catch (error) {
@@ -2898,7 +2898,7 @@
             if (!currentUser) return [];
             
             try {
-                const response = await apiCall(`/user-bets?telegramId=${currentUser.id + '.0'}`);
+                const response = await apiCall(`/user-bets?telegramId=${currentUser.id}`);
                 if (response.success) {
                     userBets = response.data || [];
                     console.log('🎯 Загружены ставки с сервера:', userBets);
@@ -2935,7 +2935,7 @@
                 const response = await apiCall('/bets/place', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id + '.0',
+                        telegramId: currentUser.id,
                         matchId: matchId,
                         betType: team,
                         amount: amount
@@ -2954,8 +2954,10 @@
                 
                 showMessage(`✅ Ставка размещена! Сумма: ${amount} 🏒`, 'success');
                 
-                console.log('🔄 Обновляем матчи...');
+                console.log('🔄 Обновляем матчи и ставки...');
                 await loadMatches();
+                await loadMyBets();
+                await updateUserBalance();
                 } else {
                 showMessage(`❌ Ошибка: ${response.error}`, 'error');
                 }
@@ -2976,7 +2978,7 @@
                 const response = await apiCall('/user/login', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id + '.0',
+                        telegramId: currentUser.id,
                         firstName: currentUser.first_name || currentUser.username || 'Игрок',
                         username: currentUser.username
                     })
@@ -3026,7 +3028,7 @@
                 const response = await apiCall('/user/bonus', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id + '.0',
+                        telegramId: currentUser.id,
                         bonusAmount: bonusAmount
                     })
                 });
@@ -3161,7 +3163,7 @@
                 const response = await apiCall('/user/login', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id + '.0',
+                        telegramId: currentUser.id,
                         firstName: currentUser.first_name || currentUser.username || 'Игрок',
                         username: currentUser.username
                     })
@@ -3742,7 +3744,7 @@
                 const response = await apiCall('/bets/place', {
                     method: 'POST',
                     body: JSON.stringify({
-                        telegramId: currentUser.id + '.0',
+                        telegramId: currentUser.id,
                         matchId: currentBetMatch.id,
                         betType: betType,
                         amount: selectedAmount
