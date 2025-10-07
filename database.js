@@ -447,6 +447,16 @@ class Database {
         });
     }
 
+    async clearAllUsers() {
+        return new Promise((resolve, reject) => {
+            // Удаляем всех пользователей
+            this.db.run('DELETE FROM users', (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
     async updateMatchScore(matchId, scoreHome, scoreAway) {
         return new Promise((resolve, reject) => {
             this.db.run(

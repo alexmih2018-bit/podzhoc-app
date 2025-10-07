@@ -1921,6 +1921,24 @@ app.post('/api/admin/reset-balances', checkAdminToken, async (req, res) => {
     }
 });
 
+// API для удаления всех пользователей
+app.post('/api/admin/clear-users', checkAdminToken, async (req, res) => {
+    try {
+        if (db) {
+            await db.clearAllUsers();
+            console.log('👥 Все пользователи удалены из базы данных');
+        }
+        
+        // Очищаем также из памяти
+        users.length = 0;
+        
+        res.json({ success: true, message: 'Все пользователи удалены' });
+    } catch (error) {
+        console.error('❌ Ошибка удаления пользователей:', error);
+        res.status(500).json({ success: false, error: 'Ошибка удаления пользователей' });
+    }
+});
+
 // API для ввода результатов матча
 app.post('/api/admin/match-result', checkAdminToken, async (req, res) => {
     try {

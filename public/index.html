@@ -2294,43 +2294,43 @@
                     // Загружаем данные пользователя из базы данных
                     await loadUserFromDatabase();
                     
-            // Показываем карточку пользователя
-            const profileCorner = document.getElementById('profile-corner');
-            const userAvatar = document.getElementById('user-avatar');
-            const username = document.getElementById('username');
-            const balanceElement = document.getElementById('balance');
-            
-            if (profileCorner) profileCorner.style.display = 'block';
-            if (userAvatar) userAvatar.textContent = currentUser.first_name[0]?.toUpperCase() || 'U';
-            if (username) username.textContent = `@${currentUser.username}`;
-            if (balanceElement) balanceElement.textContent = currentUser.balance;
+            // Показываем карточку пользователя только если пользователь авторизован
+            if (currentUser) {
+                const profileCorner = document.getElementById('profile-corner');
+                const userAvatar = document.getElementById('user-avatar');
+                const username = document.getElementById('username');
+                const balanceElement = document.getElementById('balance');
+                
+                if (profileCorner) profileCorner.style.display = 'block';
+                if (userAvatar) userAvatar.textContent = currentUser.first_name[0]?.toUpperCase() || 'U';
+                if (username) username.textContent = `@${currentUser.username}`;
+                if (balanceElement) balanceElement.textContent = currentUser.balance;
+            } else {
+                // Скрываем интерфейс если пользователь не авторизован
+                document.body.innerHTML = `
+                    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #0a0e17 0%, #1a1f2e 100%); color: white; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;">
+                        <div style="text-align: center; padding: 40px; background: rgba(255, 255, 255, 0.05); border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                            <h1 style="color: #ff6b35; margin-bottom: 20px;">🏒 PodZHoc</h1>
+                            <p style="font-size: 1.2rem; margin-bottom: 20px;">Для использования приложения необходимо открыть его через Telegram</p>
+                            <p style="color: #888;">Анонимные пользователи запрещены</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
                 } else {
-                    console.log('❌ Данные пользователя не найдены, создаем анонимного пользователя');
-                    // Создаем анонимного пользователя с сохранением ID в localStorage
-                    const savedUserId = localStorage.getItem('testUserId');
-                    currentUser = {
-                        id: savedUserId ? parseInt(savedUserId) : 1759162823434, // Фиксированный ID для тестирования
-                        username: 'anonymous',
-                        first_name: 'Игрок',
-                        last_name: '',
-                        balance: 1000 // Начальный баланс
-                    };
-                    // Сохраняем ID для будущих сессий
-                    localStorage.setItem('testUserId', currentUser.id.toString());
+                    console.log('❌ Данные пользователя не найдены, анонимные пользователи запрещены');
+                    // Анонимные пользователи запрещены
+                    currentUser = null;
+                    alert('❌ Для использования приложения необходимо авторизоваться через Telegram');
+                    return;
                 }
             } else {
-                console.log('🔧 Telegram WebApp не найден, создаем тестового пользователя');
-                // Для тестирования в браузере - используем фиксированный ID
-                const savedUserId = localStorage.getItem('testUserId');
-                currentUser = {
-                    id: savedUserId ? parseInt(savedUserId) : 1759162823434, // Фиксированный ID для тестирования
-                    username: 'browser_user',
-                    first_name: 'Игрок',
-                    last_name: '',
-                    balance: 1000 // Начальный баланс
-                };
-                // Сохраняем ID для будущих сессий
-                localStorage.setItem('testUserId', currentUser.id.toString());
+                console.log('❌ Telegram WebApp не найден, анонимные пользователи запрещены');
+                // Анонимные пользователи запрещены
+                currentUser = null;
+                alert('❌ Для использования приложения необходимо открыть его через Telegram');
+                return;
             }
             
             // Показываем карточку пользователя
