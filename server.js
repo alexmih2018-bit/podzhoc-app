@@ -178,20 +178,34 @@ async function parseKHLMatches() {
         // Используем только реальные матчи КХЛ (тестовый матч убран)
         console.log(`🏒 Загружено реальных матчей КХЛ: ${allRealMatches.length}`);
         
-        // Фильтруем матчи - показываем только те, что начинаются в ближайшие 48 часов
+        // Получаем все матчи из базы данных (включая завершенные)
+        let existingMatches = [];
+        if (db) {
+            try {
+                existingMatches = await getMatches();
+                console.log(`📊 Найдено ${existingMatches.length} матчей в базе данных`);
+            } catch (error) {
+                console.log('⚠️ Ошибка получения матчей из БД:', error.message);
+            }
+        }
+        
+        // Фильтруем матчи - показываем только те, что начинаются в ближайшие 48 часов ИЛИ уже есть в БД
         const now = new Date();
         const next48Hours = new Date(now.getTime() + 48 * 60 * 60 * 1000);
         
         const upcomingMatches = allRealMatches.filter(match => {
             const matchTime = new Date(match.startTime);
-            return matchTime >= now && matchTime <= next48Hours;
+            // Включаем матчи в ближайшие 48 часов ИЛИ уже существующие в БД
+            return (matchTime >= now && matchTime <= next48Hours) || 
+                   existingMatches.some(existing => existing.id === match.id);
         });
         
         console.log(`📅 Всего матчей в календаре: ${allRealMatches.length}`);
         console.log(`⏰ Матчей в ближайшие 48 часов: ${upcomingMatches.length}`);
+        console.log(`📊 Матчей в базе данных: ${existingMatches.length}`);
         
         if (upcomingMatches.length > 0) {
-            console.log(`🎉 Найдено ${upcomingMatches.length} РЕАЛЬНЫХ матчей КХЛ в ближайшие 48 часов`);
+            console.log(`🎉 Найдено ${upcomingMatches.length} РЕАЛЬНЫХ матчей КХЛ (включая завершенные)`);
             return upcomingMatches;
             } else {
             console.log('⚠️ В ближайшие 48 часов матчей нет, возвращаем пустой массив');
@@ -1194,21 +1208,27 @@ async function getCachedMatches() {
     console.log('🔄 Обновляем данные матчей КХЛ...');
     const freshMatches = await parseKHLMatches();
     
-    // Сохраняем матчи в базу данных или кэш
-    await saveMatches(freshMatches);
-    
-    // Получаем активные матчи
+    // Получаем матчи из базы данных (включая завершенные)
     let activeMatches;
     if (db) {
         try {
             activeMatches = await getMatches();
-            if (activeMatches.length === 0) {
-                console.log('⚠️ База данных пуста, используем свежие матчи');
-                activeMatches = freshMatches;
+            console.log(`📊 Загружено ${activeMatches.length} матчей из базы данных`);
+            
+            // Добавляем новые матчи, если их нет в БД
+            const newMatches = freshMatches.filter(fresh => 
+                !activeMatches.some(existing => existing.id === fresh.id)
+            );
+            
+            if (newMatches.length > 0) {
+                console.log(`➕ Добавляем ${newMatches.length} новых матчей в БД`);
+                await saveMatches(newMatches);
+                activeMatches = await getMatches(); // Перезагружаем из БД
             }
         } catch (error) {
             console.log('⚠️ Ошибка получения матчей из БД, используем свежие:', error.message);
             activeMatches = freshMatches;
+            await saveMatches(freshMatches);
         }
     } else {
         console.log('⚠️ База данных недоступна, используем свежие матчи');
@@ -1339,8 +1359,7 @@ async function getUserBets(telegramId) {
 // Функции для работы с матчами
 async function saveMatches(matches) {
     if (db) {
-        // Сначала очищаем дубли в базе данных
-        await clearDuplicateMatches();
+        // Сохраняем матчи без очистки - пусть остаются завершенные матчи
         return await db.saveMatches(matches);
     } else {
         // В режиме памяти матчи уже в кэше
