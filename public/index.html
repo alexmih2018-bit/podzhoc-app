@@ -1739,6 +1739,47 @@
             border-color: #20B2AA;
         }
 
+        .bet-amount-input-container {
+            margin-bottom: 20px;
+        }
+
+        .bet-amount-input-container label {
+            display: block;
+            margin-bottom: 8px;
+            color: #ffffff;
+            font-weight: 500;
+        }
+
+        .bet-amount-input {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            font-size: 1.1rem;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .bet-amount-input:focus {
+            outline: none;
+            border-color: #20B2AA;
+            box-shadow: 0 0 0 3px rgba(32, 178, 170, 0.2);
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .bet-amount-input::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .bet-amount-hint {
+            margin-top: 8px;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
         .modal-buttons {
             display: flex;
             gap: 15px;
@@ -3631,10 +3672,10 @@
             currentBetTeam = teamName;
             selectedAmount = 0;
 
-            // Сброс выбранной суммы
-            document.querySelectorAll('.bet-amount-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
+            // Очищаем поле ввода суммы
+            const betAmountInput = document.getElementById('betAmountInput');
+            betAmountInput.value = '';
+            betAmountInput.focus();
 
             // Показываем модальное окно
             document.getElementById('betModal').classList.add('show');
@@ -3648,24 +3689,31 @@
             selectedAmount = 0;
         }
 
-        // Выбор суммы ставки
-        function selectBetAmount(amount) {
-            selectedAmount = amount;
-            
-            // Обновляем UI
-            document.querySelectorAll('.bet-amount-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            document.querySelector(`[data-amount="${amount}"]`).classList.add('selected');
+        // Валидация суммы ставки
+        function validateBetAmount(amount) {
+            const numAmount = parseInt(amount);
+            if (isNaN(numAmount) || numAmount < 100 || numAmount > 5000) {
+                return false;
+            }
+            return true;
         }
 
         // Подтверждение ставки
         async function confirmBet() {
-            if (!currentBetMatch || !currentBetTeam || selectedAmount === 0) {
-                showMessage('Выберите сумму ставки', 'error');
+            const betAmountInput = document.getElementById('betAmountInput');
+            const amount = parseInt(betAmountInput.value);
+            
+            if (!currentBetMatch || !currentBetTeam) {
+                showMessage('Ошибка: матч или команда не выбраны', 'error');
                 return;
             }
+            
+            if (!validateBetAmount(amount)) {
+                showMessage('Сумма ставки должна быть от 100 до 5000', 'error');
+                return;
+            }
+            
+            selectedAmount = amount;
 
             if (!currentUser) {
                 showMessage('Ошибка: пользователь не авторизован', 'error');
@@ -3819,11 +3867,11 @@
             startBonusTimer();
             
             // Обработчики для модального окна ставок
-            document.querySelectorAll('.bet-amount-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    const amount = parseInt(btn.dataset.amount);
-                    selectBetAmount(amount);
-                });
+            const betAmountInput = document.getElementById('betAmountInput');
+            betAmountInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    confirmBet();
+                }
             });
             
             document.getElementById('confirmBet').addEventListener('click', confirmBet);
@@ -3862,14 +3910,11 @@
     <!-- Модальное окно для выбора суммы ставки -->
     <div id="betModal" class="bet-modal">
         <div class="bet-modal-content">
-            <h3>Выберите сумму ставки</h3>
-            <div class="bet-amount-selector">
-                <button class="bet-amount-btn" data-amount="100">100</button>
-                <button class="bet-amount-btn" data-amount="500">500</button>
-                <button class="bet-amount-btn" data-amount="1000">1000</button>
-                <button class="bet-amount-btn" data-amount="2000">2000</button>
-                <button class="bet-amount-btn" data-amount="3000">3000</button>
-                <button class="bet-amount-btn" data-amount="5000">5000</button>
+            <h3>Введите сумму ставки</h3>
+            <div class="bet-amount-input-container">
+                <label for="betAmountInput">Сумма ставки (100-5000):</label>
+                <input type="number" id="betAmountInput" min="100" max="5000" step="50" placeholder="Введите сумму" class="bet-amount-input">
+                <div class="bet-amount-hint">Минимум: 100, Максимум: 5000</div>
             </div>
             <div class="modal-buttons">
                 <button class="modal-btn confirm" id="confirmBet">Подтвердить</button>

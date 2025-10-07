@@ -1873,6 +1873,44 @@ app.get('/api/admin/bets', checkAdminToken, async (req, res) => {
     }
 });
 
+// API для очистки всех ставок
+app.post('/api/admin/clear-bets', checkAdminToken, async (req, res) => {
+    try {
+        if (db) {
+            await db.clearAllBets();
+            console.log('🧹 Все ставки очищены администратором');
+        }
+        
+        // Очищаем также из памяти
+        bets.length = 0;
+        
+        res.json({ success: true, message: 'Все ставки очищены' });
+    } catch (error) {
+        console.error('❌ Ошибка очистки ставок:', error);
+        res.status(500).json({ success: false, error: 'Ошибка очистки ставок' });
+    }
+});
+
+// API для сброса балансов всех пользователей
+app.post('/api/admin/reset-balances', checkAdminToken, async (req, res) => {
+    try {
+        if (db) {
+            await db.resetAllUserBalances();
+            console.log('💰 Балансы всех пользователей сброшены на 1000');
+        }
+        
+        // Обновляем также в памяти
+        users.forEach(user => {
+            user.balance = 1000;
+        });
+        
+        res.json({ success: true, message: 'Балансы всех пользователей сброшены на 1000' });
+    } catch (error) {
+        console.error('❌ Ошибка сброса балансов:', error);
+        res.status(500).json({ success: false, error: 'Ошибка сброса балансов' });
+    }
+});
+
 // API для ввода результатов матча
 app.post('/api/admin/match-result', checkAdminToken, async (req, res) => {
     try {

@@ -427,6 +427,26 @@ class Database {
         });
     }
 
+    async clearAllBets() {
+        return new Promise((resolve, reject) => {
+            // Полностью очищаем таблицу ставок
+            this.db.run('DELETE FROM bets', (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
+    async resetAllUserBalances() {
+        return new Promise((resolve, reject) => {
+            // Сбрасываем баланс всех пользователей на 1000
+            this.db.run('UPDATE users SET balance = 1000', (err) => {
+                if (err) reject(err);
+                else resolve();
+            });
+        });
+    }
+
     async updateMatchScore(matchId, scoreHome, scoreAway) {
         return new Promise((resolve, reject) => {
             this.db.run(
