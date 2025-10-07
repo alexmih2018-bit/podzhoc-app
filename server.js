@@ -2100,6 +2100,42 @@ app.get('/api/matches/finished', async (req, res) => {
     }
 });
 
+// API для очистки старых матчей (только для админа)
+app.post('/api/admin/cleanup-old-matches', checkAdminToken, async (req, res) => {
+    try {
+        const today = new Date();
+        const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate()).getTime();
+        
+        let deletedCount = 0;
+        
+        if (db) {
+            try {
+                // Удаляем матчи старше сегодняшнего дня
+                const result = await db.run('DELETE FROM matches WHERE startTime < ? AND status != "finished"', [todayStart]);
+                deletedCount = result.changes;
+                console.log(`🧹 Удалено ${deletedCount} старых матчей из базы данных`);
+            } catch (error) {
+                console.log('⚠️ Ошибка удаления из БД:', error.message);
+            }
+        }
+        
+        // Очищаем кэш матчей
+        matchesCache.data = [];
+        matchesCache.lastUpdated = 0;
+        console.log('🧹 Кэш матчей очищен');
+        
+        res.json({
+            success: true,
+            message: `Удалено ${deletedCount} старых матчей`,
+            deletedCount: deletedCount
+        });
+        
+    } catch (error) {
+        console.error('❌ Ошибка очистки старых матчей:', error);
+        res.status(500).json({ success: false, error: 'Ошибка очистки старых матчей' });
+    }
+});
+
 // API для обновления счета матча (без завершения)
 app.post('/api/admin/update-score', checkAdminToken, async (req, res) => {
     try {

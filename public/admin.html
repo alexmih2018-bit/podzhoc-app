@@ -472,6 +472,7 @@
             <p>Панель управления результатами матчей</p>
             <div style="margin-top: 15px;">
                 <button onclick="loadAllData()" style="margin-right: 10px; padding: 8px 16px; background: #4fc3f7; border: none; border-radius: 6px; color: white; cursor: pointer;">🔄 Обновить данные</button>
+                <button onclick="cleanupOldMatches()" style="margin-right: 10px; padding: 8px 16px; background: #ff9800; border: none; border-radius: 6px; color: white; cursor: pointer;">🗑️ Удалить старые матчи</button>
                 <button onclick="clearAllBets()" style="margin-right: 10px; padding: 8px 16px; background: #ff6b35; border: none; border-radius: 6px; color: white; cursor: pointer;">🧹 Очистить ставки</button>
                 <button onclick="clearAllUsers()" style="margin-right: 10px; padding: 8px 16px; background: #f44336; border: none; border-radius: 6px; color: white; cursor: pointer;">👥 Удалить всех</button>
                 <button onclick="resetAllBalances()" style="margin-right: 10px; padding: 8px 16px; background: #4caf50; border: none; border-radius: 6px; color: white; cursor: pointer;">💰 Сбросить балансы</button>
@@ -701,6 +702,28 @@
             } catch (error) {
                 console.error('❌ Ошибка очистки ставок:', error);
                 alert('❌ Ошибка очистки ставок: ' + error.message);
+            }
+        }
+
+        async function cleanupOldMatches() {
+            if (!confirm('🗑️ Удалить все старые матчи (до сегодняшнего дня)? Завершенные матчи останутся.')) {
+                return;
+            }
+            
+            try {
+                console.log('🗑️ Начинаем очистку старых матчей...');
+                const response = await apiCall('/admin/cleanup-old-matches', { method: 'POST' });
+                console.log('📊 Ответ сервера:', response);
+                
+                if (response.success) {
+                    alert(`✅ Успешно удалено ${response.deletedCount} старых матчей!`);
+                    await loadAllData();
+                } else {
+                    alert('❌ Ошибка очистки матчей: ' + (response.error || 'Неизвестная ошибка'));
+                }
+            } catch (error) {
+                console.error('❌ Ошибка очистки матчей:', error);
+                alert('❌ Ошибка очистки матчей: ' + error.message);
             }
         }
 
