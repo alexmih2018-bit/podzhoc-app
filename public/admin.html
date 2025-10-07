@@ -623,17 +623,22 @@
 
         async function apiCall(endpoint, options = {}) {
             try {
+                const token = localStorage.getItem('admin_token');
+                console.log(`🔑 Используем токен: ${token ? 'есть' : 'нет'}`);
+                
                 const response = await fetch(`${API_BASE_URL}${endpoint}`, {
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': localStorage.getItem('admin_token'),
+                        'Authorization': `Bearer ${token}`,
                         ...options.headers
                     },
                     ...options
                 });
 
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    const errorText = await response.text();
+                    console.error(`❌ HTTP Error ${response.status}:`, errorText);
+                    throw new Error(`HTTP error! status: ${response.status}, message: ${errorText}`);
                 }
 
                 return await response.json();
@@ -658,16 +663,19 @@
             }
             
             try {
-                const response = await apiCall('/admin/clear-bets', 'POST');
+                console.log('🧹 Начинаем очистку ставок...');
+                const response = await apiCall('/admin/clear-bets', { method: 'POST' });
+                console.log('📊 Ответ сервера:', response);
+                
                 if (response.success) {
                     alert('✅ Все ставки успешно очищены!');
                     await loadAllData();
                 } else {
-                    alert('❌ Ошибка очистки ставок: ' + response.error);
+                    alert('❌ Ошибка очистки ставок: ' + (response.error || 'Неизвестная ошибка'));
                 }
             } catch (error) {
                 console.error('❌ Ошибка очистки ставок:', error);
-                alert('❌ Ошибка очистки ставок');
+                alert('❌ Ошибка очистки ставок: ' + error.message);
             }
         }
 
@@ -677,16 +685,19 @@
             }
             
             try {
-                const response = await apiCall('/admin/reset-balances', 'POST');
+                console.log('💰 Начинаем сброс балансов...');
+                const response = await apiCall('/admin/reset-balances', { method: 'POST' });
+                console.log('📊 Ответ сервера:', response);
+                
                 if (response.success) {
                     alert('✅ Балансы всех пользователей успешно сброшены на 1000!');
                     await loadAllData();
                 } else {
-                    alert('❌ Ошибка сброса балансов: ' + response.error);
+                    alert('❌ Ошибка сброса балансов: ' + (response.error || 'Неизвестная ошибка'));
                 }
             } catch (error) {
                 console.error('❌ Ошибка сброса балансов:', error);
-                alert('❌ Ошибка сброса балансов');
+                alert('❌ Ошибка сброса балансов: ' + error.message);
             }
         }
 
