@@ -8,7 +8,16 @@ const ADMIN_TOKEN = process.env.ADMIN_TOKEN || 'podzhoc_admin_2024_secret';
 
 // Функция проверки админского токена
 function checkAdminToken(req, res, next) {
-    const token = req.headers.authorization || req.headers['x-admin-token'];
+    let token = req.headers.authorization || req.headers['x-admin-token'];
+    
+    // Обрабатываем формат "Bearer token"
+    if (token && token.startsWith('Bearer ')) {
+        token = token.substring(7); // Убираем "Bearer "
+    }
+    
+    console.log(`🔑 Проверка токена админа: ${token ? 'предоставлен' : 'не предоставлен'}`);
+    console.log(`🔑 Ожидаемый токен: ${ADMIN_TOKEN}`);
+    console.log(`🔑 Полученный токен: ${token}`);
     
     if (!token) {
         return res.status(401).json({ success: false, error: 'Токен админа не предоставлен' });
@@ -18,6 +27,7 @@ function checkAdminToken(req, res, next) {
         return res.status(403).json({ success: false, error: 'Неверный токен админа' });
     }
     
+    console.log('✅ Токен админа валиден');
     next();
 }
 

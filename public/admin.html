@@ -583,10 +583,15 @@
             event.preventDefault();
             const token = document.getElementById('admin-token').value;
             
+            console.log(`🔑 Введенный токен: ${token}`);
+            console.log(`🔑 Ожидаемый токен: ${ADMIN_TOKEN}`);
+            
             if (token === ADMIN_TOKEN) {
                 localStorage.setItem('admin_token', token);
+                console.log('✅ Токен сохранен в localStorage');
                 showMainContent();
             } else {
+                console.log('❌ Неверный токен');
                 alert('❌ Неверный токен!');
             }
         }
@@ -1147,8 +1152,15 @@
 
         // Проверяем авторизацию при загрузке страницы
         document.addEventListener('DOMContentLoaded', () => {
-            if (!checkAuth()) {
-                // Показываем форму авторизации
+            const savedToken = localStorage.getItem('admin_token');
+            console.log(`🔑 Сохраненный токен: ${savedToken}`);
+            console.log(`🔑 Ожидаемый токен: ${ADMIN_TOKEN}`);
+            
+            if (savedToken === ADMIN_TOKEN) {
+                console.log('✅ Авторизация успешна, показываем основное содержимое');
+                showMainContent();
+            } else {
+                console.log('❌ Токен не найден или неверный, показываем форму авторизации');
             }
         });
     </script>
