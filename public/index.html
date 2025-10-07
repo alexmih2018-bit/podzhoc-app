@@ -3258,6 +3258,7 @@
             else if (team.includes('сибирь') || team.includes('sibir')) teamFolder = 'sibir';
             else if (team.includes('сочи') || team.includes('sochi')) teamFolder = 'sochi';
             else if (team.includes('трактор') || team.includes('traktor')) teamFolder = 'traktor';
+            else if (team.includes('шанхай') || team.includes('shanghai') || team.includes('дракон') || team.includes('dragon')) teamFolder = 'shanghai_dragons';
             
             const location = isHome ? 'home' : 'away';
             const cardPath = `images/teams/${teamFolder}/${location}/card.png?v=15`;
@@ -3292,10 +3293,14 @@
             else if (team.includes('сибирь') || team.includes('sibir')) teamFolder = 'sibir';
             else if (team.includes('сочи') || team.includes('sochi')) teamFolder = 'sochi';
             else if (team.includes('трактор') || team.includes('traktor')) teamFolder = 'traktor';
+            else if (team.includes('шанхай') || team.includes('shanghai') || team.includes('дракон') || team.includes('dragon')) teamFolder = 'shanghai_dragons';
             
             console.log(`🔍 Поиск кнопки ставки для команды "${teamName}" -> папка: ${teamFolder}`);
             if (teamName.toLowerCase().includes('трактор') || teamName.toLowerCase().includes('traktor')) {
                 console.log(`🚨 ТРАКТОР НАЙДЕН! Команда: "${teamName}", папка: ${teamFolder}`);
+            }
+            if (teamName.toLowerCase().includes('шанхай') || teamName.toLowerCase().includes('shanghai') || teamName.toLowerCase().includes('дракон') || teamName.toLowerCase().includes('dragon')) {
+                console.log(`🚨 ШАНХАЙСКИЕ ДРАКОНЫ НАЙДЕНЫ! Команда: "${teamName}", папка: ${teamFolder}`);
             }
             
             // Проверяем, существует ли файл кнопки ставки
@@ -3332,10 +3337,14 @@
             else if (team.includes('сибирь') || team.includes('sibir')) teamFile = 'sibir';
             else if (team.includes('сочи') || team.includes('sochi')) teamFile = 'sochi';
             else if (team.includes('трактор') || team.includes('traktor')) teamFile = 'traktor';
+            else if (team.includes('шанхай') || team.includes('shanghai') || team.includes('дракон') || team.includes('dragon')) teamFile = 'shanghai_dragons';
             
             console.log(`🔍 Поиск логотипа для команды "${teamName}" -> файл: ${teamFile}`);
             if (teamName.toLowerCase().includes('трактор') || teamName.toLowerCase().includes('traktor')) {
                 console.log(`🚨 ТРАКТОР НАЙДЕН! Команда: "${teamName}", файл: ${teamFile}`);
+            }
+            if (teamName.toLowerCase().includes('шанхай') || teamName.toLowerCase().includes('shanghai') || teamName.toLowerCase().includes('дракон') || teamName.toLowerCase().includes('dragon')) {
+                console.log(`🚨 ШАНХАЙСКИЕ ДРАКОНЫ НАЙДЕНЫ! Команда: "${teamName}", файл: ${teamFile}`);
             }
             
             // Используем кнопки из папки bet_buttons
